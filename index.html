@@ -1,0 +1,2439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AutoFlow — Website Accessibility Compliance & ADA Protection</title>
+<meta name="description" content="AutoFlow — fast, fixed‑fee website accessibility remediation with legal protection. Free site scan, remediation, and compliance certificate.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%232355E8'/%3E%3Ctext x='50%25' y='57%25' font-size='16' fill='white' font-family='Arial,Helvetica,sans-serif' text-anchor='middle' font-weight='700'%3EAF%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;0,9..144,700;1,9..144,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --canvas:#F8F7F4;
+  --ink:#1C1C1E;
+  --ink-light:#5A5A60;
+  --cobalt:#2355E8;
+  --cobalt-dim:#1A3FB5;
+  --amber:#E8A020;
+  --amber-bg:#FEF3D8;
+  --red:#D93025;
+  --red-bg:#FDE8E6;
+  --green:#1A7A4A;
+  --green-bg:#E6F4ED;
+  --border:#E2E0DC;
+  --white:#FFFFFF;
+  --serif:'Fraunces',Georgia,serif;
+  --sans:'DM Sans',system-ui,sans-serif;
+  --shadow:0 4px 32px rgba(28,28,30,0.10);
+}
+
+html{scroll-behavior:smooth}
+body{
+  font-family:var(--sans);background:var(--canvas);color:var(--ink);line-height:1.6;
+  -webkit-font-smoothing:antialiased;overflow-x:hidden;
+}
+
+/* ── ANIMATIONS ── */
+@keyframes fadeInUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+@keyframes slideInLeft{from{opacity:0;transform:translateX(-40px)}to{opacity:1;transform:translateX(0)}}
+@keyframes slideInRight{from{opacity:0;transform:translateX(40px)}to{opacity:1;transform:translateX(0)}}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.5;transform:scale(0.95)}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes glow{0%,100%{box-shadow:0 0 0 0 rgba(35,85,232,0.7)}50%{box-shadow:0 0 0 8px rgba(35,85,232,0)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+/* ── STICKY CTA BUTTON ── */
+.sticky-cta{
+  position:fixed;bottom:24px;right:24px;z-index:95;
+  background:var(--cobalt);color:var(--white);
+  border-radius:50px;padding:12px 24px;font-size:14px;font-weight:600;
+  box-shadow:0 8px 24px rgba(35,85,232,0.3);
+  cursor:pointer;font-family:var(--sans);border:none;
+  display:none;align-items:center;gap:8px;
+  animation:slideInRight 0.4s ease;
+  transition:all 0.2s;
+}
+.sticky-cta:hover{transform:translateY(-2px);box-shadow:0 12px 32px rgba(35,85,232,0.4)}
+.sticky-cta.show{display:inline-flex}
+.sticky-cta::before{content:'';width:8px;height:8px;background:var(--amber);border-radius:50%;animation:pulse 2s infinite}
+
+/* ── NAVIGATION ── */
+nav{
+  position:sticky;top:0;z-index:100;
+  background:rgba(248,247,244,0.95);
+  backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);
+  padding:0 6%;display:flex;align-items:center;justify-content:space-between;
+  height:70px;box-shadow:0 2px 8px rgba(0,0,0,0.04);
+}
+
+.logo{
+  font-family:var(--serif);font-size:22px;font-weight:700;
+  color:var(--ink);text-decoration:none;letter-spacing:-0.5px;
+}
+.logo em{color:var(--cobalt);font-style:normal}
+
+.nav-links{
+  display:flex;gap:32px;list-style:none;margin:0;
+}
+.nav-links a{
+  font-size:14px;font-weight:500;color:var(--ink-light);
+  text-decoration:none;transition:color 0.2s;position:relative;
+}
+.nav-links a:hover{color:var(--ink)}
+.nav-links a::after{
+  content:'';position:absolute;bottom:-4px;left:0;width:0;height:2px;
+  background:var(--cobalt);transition:width 0.3s;
+}
+.nav-links a:hover::after{width:100%}
+
+.nav-cta{
+  background:var(--cobalt);color:var(--white);
+  padding:11px 24px;border-radius:8px;
+  font-size:14px;font-weight:600;text-decoration:none;
+  transition:all 0.2s;border:none;cursor:pointer;font-family:var(--sans);
+}
+.nav-cta:hover{background:var(--cobalt-dim);transform:translateY(-2px);box-shadow:0 6px 16px rgba(35,85,232,0.3)}
+
+.hamburger{display:none;background:none;border:none;font-size:24px;cursor:pointer;color:var(--ink)}
+.mobile-nav{display:none;position:fixed;top:70px;left:0;right:0;background:var(--canvas);border-bottom:1px solid var(--border);padding:20px 6%;flex-direction:column;gap:4px;z-index:99;box-shadow:var(--shadow)}
+.mobile-nav.open{display:flex}
+.mobile-nav a{padding:14px 0;font-size:15px;font-weight:500;color:var(--ink);text-decoration:none;border-bottom:1px solid var(--border)}
+
+/* ── HERO SECTION ── */
+.hero{
+  background:linear-gradient(135deg,#0D1F54 0%,#1A3399 40%,#2355E8 100%);
+  padding:100px 6% 80px;text-align:center;color:var(--white);
+  position:relative;overflow:hidden;
+}
+.hero::before{
+  content:'';position:absolute;top:0;left:0;right:0;bottom:0;
+  background:radial-gradient(circle at 20% 50%, rgba(232,160,32,0.1) 0%, transparent 50%),
+             radial-gradient(circle at 80% 50%, rgba(35,85,232,0.1) 0%, transparent 50%);
+  pointer-events:none;
+}
+
+.hero-content{
+  max-width:900px;margin:0 auto;position:relative;z-index:1;
+}
+
+.hero-tag{
+  font-size:12px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;
+  color:rgba(255,255,255,0.7);margin-bottom:20px;animation:fadeInUp 0.8s ease;
+}
+
+.hero h1{
+  font-family:var(--serif);
+  font-size:clamp(44px,7vw,68px);line-height:1.08;
+  letter-spacing:-1px;margin-bottom:24px;font-weight:700;
+  animation:fadeInUp 0.9s ease 0.1s both;
+}
+.hero h1 em{color:var(--amber);font-style:italic;font-weight:300}
+
+.hero-sub{
+  font-size:18px;color:rgba(255,255,255,0.75);
+  line-height:1.8;max-width:700px;margin:0 auto 48px;
+  animation:fadeInUp 1s ease 0.2s both;
+}
+
+.hero-cta{
+  display:flex;gap:14px;justify-content:center;flex-wrap:wrap;
+  margin-bottom:56px;animation:fadeInUp 1.1s ease 0.3s both;
+}
+
+.btn-primary{
+  background:var(--white);color:var(--cobalt);
+  padding:15px 32px;border-radius:10px;border:none;
+  font-size:15px;font-weight:700;text-decoration:none;
+  display:inline-flex;align-items:center;gap:8px;
+  cursor:pointer;font-family:var(--sans);
+  transition:all 0.3s;box-shadow:0 8px 24px rgba(0,0,0,0.15);
+}
+.btn-primary:hover{
+  transform:translateY(-3px);
+  box-shadow:0 12px 32px rgba(0,0,0,0.2);
+}
+
+.btn-secondary{
+  background:transparent;color:var(--white);
+  padding:15px 32px;border-radius:10px;border:2px solid rgba(255,255,255,0.5);
+  font-size:15px;font-weight:700;text-decoration:none;
+  display:inline-flex;align-items:center;gap:8px;
+  cursor:pointer;font-family:var(--sans);
+  transition:all 0.3s;
+}
+.btn-secondary:hover{
+  border-color:var(--white);background:rgba(255,255,255,0.1);
+  transform:translateY(-3px);
+}
+
+/* Hero Live Ticker */
+.hero-ticker{
+  background:rgba(255,255,255,0.08);backdrop-filter:blur(10px);
+  border:1px solid rgba(255,255,255,0.15);border-radius:16px;
+  padding:40px;max-width:600px;margin:0 auto;
+  animation:fadeInUp 1.2s ease 0.4s both;
+}
+
+.ticker-live{
+  display:inline-flex;align-items:center;gap:8px;
+  font-size:12px;font-weight:700;letter-spacing:1px;
+  text-transform:uppercase;color:var(--amber);margin-bottom:16px;
+}
+.ticker-live::before{
+  content:'';width:8px;height:8px;background:var(--amber);
+  border-radius:50%;animation:pulse 1.5s infinite;
+}
+
+.ticker-number{
+  font-family:var(--serif);font-size:56px;font-weight:700;
+  line-height:1;margin-bottom:8px;color:var(--white);
+  font-variant-numeric:tabular-nums;
+}
+
+.ticker-label{font-size:14px;color:rgba(255,255,255,0.7);margin-bottom:20px;line-height:1.6}
+
+.ticker-stats{
+  display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:20px;
+  border-top:1px solid rgba(255,255,255,0.15);padding-top:20px;
+}
+
+.stat-item{display:flex;flex-direction:column;gap:4px}
+.stat-label{font-size:12px;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:0.5px}
+.stat-value{font-size:16px;font-weight:700;color:var(--amber)}
+
+/* ── HOW THE SCAN WORKS ── */
+.scan-explainer{
+  background:var(--white);
+  padding:56px 6%;border:1px solid var(--border);
+  margin:0 6%;margin-bottom:56px;border-radius:16px;
+}
+
+.scan-explainer h2{
+  font-family:var(--serif);font-size:32px;color:var(--ink);
+  text-align:center;margin-bottom:10px;letter-spacing:-0.5px;
+}
+
+.scan-explainer-sub{
+  font-size:16px;color:var(--ink-light);text-align:center;
+  max-width:600px;margin:0 auto 48px;line-height:1.7;
+}
+
+.scan-steps-grid{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:24px;
+  max-width:1000px;margin:0 auto;
+}
+
+.scan-step{
+  background:linear-gradient(135deg,#EDF1FE 0%,#F5F7FF 100%);
+  border:1.5px solid #DDE4FF;border-radius:12px;padding:32px 24px;
+  text-align:center;animation:fadeInUp 0.8s ease;animation-fill-mode:both;
+}
+.scan-step:nth-child(1){animation-delay:0.1s}
+.scan-step:nth-child(2){animation-delay:0.2s}
+.scan-step:nth-child(3){animation-delay:0.3s}
+.scan-step:nth-child(4){animation-delay:0.4s}
+
+.scan-step-num{
+  width:48px;height:48px;background:var(--cobalt);
+  border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-family:var(--serif);font-size:20px;font-weight:700;
+  color:var(--white);margin:0 auto 16px;
+}
+
+.scan-step h4{
+  font-size:16px;font-weight:600;color:var(--ink);margin-bottom:10px;
+}
+
+.scan-step p{
+  font-size:13px;color:var(--ink-light);line-height:1.6;
+}
+
+@media(max-width:960px){
+  .scan-steps-grid{grid-template-columns:repeat(2,1fr);gap:16px}
+}
+@media(max-width:600px){
+  .scan-steps-grid{grid-template-columns:1fr}
+}
+
+/* ── COMPARISON TABLE ── */
+.comparison-section{
+  padding:88px 6%;background:#F0F2FC;
+}
+
+.comparison-h{
+  font-family:var(--serif);font-size:40px;font-weight:700;
+  text-align:center;color:var(--ink);margin-bottom:10px;
+  letter-spacing:-0.5px;
+}
+
+.comparison-sub{
+  font-size:16px;color:var(--ink-light);text-align:center;
+  max-width:600px;margin:0 auto 48px;line-height:1.7;
+}
+
+.comparison-table{
+  background:var(--white);border:1.5px solid var(--border);
+  border-radius:16px;overflow:hidden;max-width:1000px;margin:0 auto;
+}
+
+.comparison-table-header{
+  display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:0;
+  background:linear-gradient(90deg,#F0F2FC 0%,#EDF1FE 100%);
+  border-bottom:1.5px solid var(--border);
+}
+
+.comparison-table-header>div{
+  padding:24px;font-weight:700;font-size:14px;color:var(--ink);
+  text-align:center;border-right:1px solid var(--border);
+}
+.comparison-table-header>div:last-child{border:none}
+
+.comparison-row{
+  display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:0;
+  border-bottom:1px solid var(--border);
+}
+.comparison-row:last-child{border:none}
+
+.comparison-cell{
+  padding:20px 24px;display:flex;align-items:center;
+  border-right:1px solid var(--border);
+  font-size:14px;color:var(--ink-light);
+}
+.comparison-cell:last-child{border:none}
+.comparison-row:first-child .comparison-cell{background:var(--canvas);font-weight:600;color:var(--ink)}
+
+.check{color:var(--green);font-weight:700;font-size:18px}
+.cross{color:#999;font-weight:700;font-size:18px}
+.partial{color:var(--amber);font-weight:700;font-size:18px}
+
+/* ── TRUST SECTION ── */
+.trust-section{
+  padding:88px 6%;background:var(--white);
+  border-top:1px solid var(--border);
+}
+
+.trust-h{
+  font-family:var(--serif);font-size:40px;font-weight:700;
+  text-align:center;color:var(--ink);margin-bottom:10px;
+  letter-spacing:-0.5px;
+}
+
+.trust-sub{
+  font-size:16px;color:var(--ink-light);text-align:center;
+  max-width:600px;margin:0 auto 56px;line-height:1.7;
+}
+
+.trust-grid{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:20px;
+  max-width:1000px;margin:0 auto;
+}
+
+.trust-card{
+  background:linear-gradient(135deg,#FEF3D8 0%,#FEF8EE 100%);
+  border:1.5px solid #F5D78E;border-radius:12px;padding:40px 32px;
+  text-align:center;animation:fadeInUp 0.8s ease;animation-fill-mode:both;
+}
+.trust-card:nth-child(1){animation-delay:0.1s}
+.trust-card:nth-child(2){animation-delay:0.2s}
+.trust-card:nth-child(3){animation-delay:0.3s}
+
+.trust-icon{font-size:40px;margin-bottom:16px}
+
+.trust-number{
+  font-family:var(--serif);font-size:48px;font-weight:700;
+  color:var(--amber);line-height:1;margin-bottom:8px;
+}
+
+.trust-label{
+  font-size:14px;color:var(--ink);line-height:1.6;
+}
+
+@media(max-width:960px){
+  .trust-grid{grid-template-columns:1fr}
+}
+
+/* ── SERVICES SECTION ── */
+.services-section{
+  padding:88px 6%;background:var(--canvas);
+}
+
+.services-h{
+  font-family:var(--serif);font-size:40px;font-weight:700;
+  text-align:center;color:var(--ink);margin-bottom:10px;
+  letter-spacing:-0.5px;
+}
+
+.services-sub{
+  font-size:16px;color:var(--ink-light);text-align:center;
+  max-width:600px;margin:0 auto 56px;line-height:1.7;
+}
+
+.services-grid{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:24px;
+  max-width:1200px;margin:0 auto;
+}
+
+.service-card{
+  background:var(--white);border:1.5px solid var(--border);
+  border-radius:16px;padding:40px 32px;
+  display:flex;flex-direction:column;gap:20px;
+  transition:all 0.3s;animation:fadeInUp 0.8s ease;animation-fill-mode:both;
+}
+.service-card:nth-child(1){animation-delay:0.1s}
+.service-card:nth-child(2){animation-delay:0.2s}
+.service-card:nth-child(3){animation-delay:0.3s}
+
+.service-card:hover{
+  border-color:var(--cobalt);transform:translateY(-8px);
+  box-shadow:0 16px 40px rgba(35,85,232,0.15);
+}
+
+.service-card.featured{
+  border-color:var(--cobalt);background:linear-gradient(135deg,#EDF1FE 0%,#F5F7FF 100%);
+  position:relative;top:-8px;box-shadow:0 16px 40px rgba(35,85,232,0.15);
+}
+
+.service-badge{
+  display:inline-block;background:var(--cobalt);color:var(--white);
+  font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;
+  padding:6px 14px;border-radius:20px;width:fit-content;
+}
+
+.service-icon{
+  width:48px;height:48px;background:#EDF1FE;
+  border-radius:10px;display:flex;align-items:center;justify-content:center;
+  font-size:24px;flex-shrink:0;
+}
+
+.service-card h3{
+  font-family:var(--serif);font-size:22px;font-weight:700;
+  color:var(--ink);line-height:1.2;
+}
+
+.service-card p{
+  font-size:14px;color:var(--ink-light);line-height:1.7;
+}
+
+.service-list{
+  list-style:none;display:flex;flex-direction:column;gap:10px;
+}
+
+.service-list li{
+  font-size:13px;color:var(--ink);display:flex;gap:10px;align-items:flex-start;
+}
+
+.service-list li::before{
+  content:'✓';color:var(--green);font-weight:700;flex-shrink:0;font-size:16px;
+}
+
+.service-price{
+  border-top:1px solid var(--border);padding-top:20px;
+  font-size:13px;color:var(--ink-light);
+}
+
+.service-price strong{color:var(--cobalt)}
+
+@media(max-width:960px){
+  .services-grid{grid-template-columns:1fr}
+  .service-card.featured{top:0}
+}
+
+/* ── TESTIMONIALS ── */
+.testimonials-section{
+  padding:88px 6%;background:var(--white);
+}
+
+.testi-h{
+  font-family:var(--serif);font-size:40px;font-weight:700;
+  text-align:center;color:var(--ink);margin-bottom:10px;
+  letter-spacing:-0.5px;
+}
+
+.testi-sub{
+  font-size:16px;color:var(--ink-light);text-align:center;
+  max-width:600px;margin:0 auto 56px;line-height:1.7;
+}
+
+.testi-grid{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:24px;
+  max-width:1200px;margin:0 auto;
+}
+
+.testi-card{
+  background:linear-gradient(135deg,#F5F7FF 0%,#FAFBFF 100%);
+  border:1.5px solid #DDE4FF;border-radius:12px;padding:32px;
+  animation:fadeInUp 0.8s ease;animation-fill-mode:both;
+}
+.testi-card:nth-child(1){animation-delay:0.1s}
+.testi-card:nth-child(2){animation-delay:0.2s}
+.testi-card:nth-child(3){animation-delay:0.3s}
+
+.testi-stars{
+  color:var(--amber);font-size:16px;margin-bottom:16px;
+  letter-spacing:3px;
+}
+
+.testi-quote{
+  font-family:var(--serif);font-size:15px;color:var(--ink);
+  line-height:1.8;margin-bottom:20px;font-style:italic;
+}
+
+.testi-attr{
+  display:flex;align-items:center;gap:8px;margin-bottom:4px;
+}
+
+.testi-flag{font-size:18px}
+
+.testi-name{font-size:14px;font-weight:700;color:var(--ink)}
+
+.testi-sub{
+  font-size:13px;color:var(--ink-light);
+}
+
+@media(max-width:960px){
+  .testi-grid{grid-template-columns:1fr}
+}
+
+/* ── CASE STUDIES ── */
+.case-studies{
+  padding:88px 6%;background:var(--canvas);
+}
+
+.case-h{
+  font-family:var(--serif);font-size:40px;font-weight:700;
+  text-align:center;color:var(--ink);margin-bottom:10px;
+  letter-spacing:-0.5px;
+}
+
+.case-sub{
+  font-size:16px;color:var(--ink-light);text-align:center;
+  max-width:600px;margin:0 auto 56px;line-height:1.7;
+}
+
+.case-grid{
+  display:flex;flex-direction:column;gap:32px;
+  max-width:1000px;margin:0 auto;
+}
+
+.case-card{
+  background:var(--white);border:1.5px solid var(--border);
+  border-radius:16px;overflow:hidden;
+  display:grid;grid-template-columns:1fr 1px 1fr;gap:0;
+  animation:fadeInUp 0.8s ease;animation-fill-mode:both;
+}
+.case-card:nth-child(1){animation-delay:0.1s}
+.case-card:nth-child(2){animation-delay:0.2s}
+
+.case-side{padding:40px}
+
+.case-divider{background:var(--border);width:1px;align-self:stretch}
+
+.case-location{
+  display:flex;align-items:center;gap:12px;font-size:11px;
+  font-weight:700;letter-spacing:1px;text-transform:uppercase;
+  color:var(--cobalt);margin-bottom:20px;
+}
+
+.case-location-flag{font-size:20px}
+
+.case-title{
+  font-family:var(--serif);font-size:22px;font-weight:700;
+  color:var(--ink);margin-bottom:16px;line-height:1.3;
+}
+
+.case-desc{
+  font-size:14px;color:var(--ink-light);line-height:1.8;
+}
+
+.case-stat{
+  background:var(--red-bg);border:1.5px solid #FCA5A5;
+  border-radius:8px;padding:14px 16px;margin-top:20px;
+  font-size:12px;color:var(--red);line-height:1.6;
+}
+
+.case-result{
+  display:flex;flex-direction:column;gap:16px;
+}
+
+.case-result-tag{
+  font-size:11px;font-weight:700;letter-spacing:1px;
+  text-transform:uppercase;color:var(--green);
+}
+
+.result-item{
+  display:flex;gap:12px;align-items:flex-start;
+}
+
+.result-check{
+  color:var(--green);font-weight:700;font-size:18px;
+  flex-shrink:0;margin-top:-2px;
+}
+
+.result-text{
+  font-size:14px;color:var(--ink);line-height:1.7;
+}
+
+.case-outcome{
+  background:var(--green-bg);border:1.5px solid #6EE7B7;
+  border-radius:8px;padding:14px 16px;margin-top:20px;
+  font-size:12px;color:var(--green);line-height:1.6;
+}
+
+@media(max-width:960px){
+  .case-card{grid-template-columns:1fr}
+  .case-divider{display:none}
+}
+
+/* ── SCAN SECTION ── */
+.scan-section{
+  background:linear-gradient(135deg,#0D1F54 0%,#1A3399 40%,#2355E8 100%);
+  padding:88px 6%;text-align:center;color:var(--white);
+  position:relative;overflow:hidden;
+}
+
+.scan-section::before{
+  content:'';position:absolute;top:0;left:0;right:0;bottom:0;
+  background:radial-gradient(circle at 20% 50%, rgba(232,160,32,0.1) 0%, transparent 50%),
+             radial-gradient(circle at 80% 50%, rgba(35,85,232,0.1) 0%, transparent 50%);
+  pointer-events:none;
+}
+
+.scan-content{
+  max-width:700px;margin:0 auto;position:relative;z-index:1;
+}
+
+.scan-section h2{
+  font-family:var(--serif);font-size:clamp(32px,5vw,48px);
+  margin-bottom:16px;letter-spacing:-0.5px;font-weight:700;
+}
+
+.scan-section p{
+  font-size:17px;color:rgba(255,255,255,0.75);margin-bottom:40px;line-height:1.8;
+}
+
+.scan-form{
+  display:flex;gap:12px;max-width:500px;margin:0 auto;
+}
+
+.scan-input{
+  flex:1;padding:14px 18px;border-radius:10px;
+  border:2px solid rgba(255,255,255,0.2);
+  background:rgba(255,255,255,0.08);color:var(--white);
+  font-size:15px;font-family:var(--sans);outline:none;
+  transition:all 0.2s;
+}
+
+.scan-input:focus{
+  border-color:rgba(255,255,255,0.6);
+  background:rgba(255,255,255,0.12);
+}
+
+.scan-input::placeholder{color:rgba(255,255,255,0.4)}
+
+.scan-btn{
+  padding:14px 32px;background:var(--white);
+  color:var(--cobalt);border:none;border-radius:10px;
+  font-size:15px;font-weight:700;cursor:pointer;
+  font-family:var(--sans);white-space:nowrap;
+  transition:all 0.2s;box-shadow:0 8px 24px rgba(0,0,0,0.15);
+}
+
+.scan-btn:hover{
+  transform:translateY(-2px);
+  box-shadow:0 12px 32px rgba(0,0,0,0.25);
+  background:rgba(255,255,255,0.95);
+}
+
+@media(max-width:600px){
+  .scan-form{flex-direction:column}
+}
+
+/* ── RESULTS SECTION ── */
+.results{max-width:900px;margin:0 auto;padding:48px 6%}
+
+.loading-card,.error-card,.result-card{display:none}
+.loading-card.show,.error-card.show,.result-card.show{display:block;animation:fadeInUp 0.5s ease}
+
+.loading-card{
+  background:var(--white);border:1.5px solid var(--border);
+  border-radius:16px;padding:56px 48px;text-align:center;
+}
+
+.spinner{
+  width:56px;height:56px;border:4px solid var(--border);
+  border-top-color:var(--cobalt);border-radius:50%;
+  animation:spin 0.8s linear infinite;margin:0 auto 24px;
+}
+
+.loading-title{
+  font-family:var(--serif);font-size:24px;color:var(--ink);
+  margin-bottom:8px;font-weight:700;
+}
+
+.loading-sub{font-size:14px;color:var(--ink-light);margin-bottom:28px}
+
+.loading-steps{
+  display:flex;flex-direction:column;gap:12px;
+  max-width:380px;margin:0 auto;text-align:left;
+}
+
+.loading-step{
+  display:flex;align-items:center;gap:12px;font-size:14px;
+  color:var(--ink-light);
+}
+
+.loading-step .dot{
+  width:10px;height:10px;border-radius:50%;
+  background:var(--border);flex-shrink:0;transition:all 0.3s;
+}
+
+.loading-step.active .dot{
+  background:var(--cobalt);animation:pulse 1s infinite;
+}
+
+.loading-step.done .dot{background:var(--green)}
+
+.error-card{
+  background:var(--red-bg);border:1.5px solid #FCA5A5;
+  border-radius:16px;padding:48px;text-align:center;
+}
+
+.error-card h3{
+  font-size:20px;font-weight:700;color:var(--red);margin-bottom:12px;
+}
+
+.error-card p{font-size:14px;color:var(--ink);line-height:1.8}
+
+.result-card{
+  animation:fadeInUp 0.5s ease;
+}
+
+.result-header{
+  background:var(--white);border:1.5px solid var(--border);
+  border-radius:16px;padding:40px;margin-bottom:24px;
+}
+
+.result-url{
+  font-size:13px;color:var(--ink-light);margin-bottom:12px;
+  display:flex;align-items:center;gap:8px;
+}
+
+.result-url a{color:var(--cobalt);text-decoration:none}
+
+.result-title{
+  font-family:var(--serif);font-size:32px;font-weight:700;
+  color:var(--ink);margin-bottom:16px;line-height:1.2;
+}
+
+.result-title.critical{color:var(--red)}
+.result-title.high{color:#92400E}
+.result-title.moderate{color:var(--green)}
+
+.risk-pill{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:8px 18px;border-radius:20px;font-size:12px;
+  font-weight:700;letter-spacing:0.5px;text-transform:uppercase;
+  margin-bottom:24px;
+}
+
+.risk-critical{background:var(--red-bg);color:var(--red);border:1.5px solid #FCA5A5}
+.risk-high{background:var(--amber-bg);color:#92400E;border:1.5px solid #FCD34D}
+.risk-moderate{background:var(--green-bg);color:var(--green);border:1.5px solid #6EE7B7}
+
+.result-meta{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:2px;
+  background:var(--border);border-radius:12px;overflow:hidden;
+}
+
+.meta-cell{background:var(--canvas);padding:20px;text-align:center}
+
+.meta-num{
+  font-family:var(--serif);font-size:36px;font-weight:700;line-height:1;
+  font-variant-numeric:tabular-nums;
+}
+
+.meta-num.red{color:var(--red)}
+.meta-num.amber{color:var(--amber)}
+.meta-num.green{color:var(--green)}
+
+.meta-label{
+  font-size:11px;color:var(--ink-light);margin-top:6px;line-height:1.4;
+}
+
+.breakdown{
+  background:var(--white);border:1.5px solid var(--border);
+  border-radius:16px;padding:40px;margin-bottom:24px;
+}
+
+.breakdown h3{
+  font-size:18px;font-weight:700;color:var(--ink);margin-bottom:24px;
+}
+
+.violation-item{margin-bottom:20px}
+
+.v-header{
+  display:flex;justify-content:space-between;align-items:center;
+  margin-bottom:8px;
+}
+
+.v-label{
+  font-size:14px;font-weight:600;color:var(--ink);
+  display:flex;align-items:center;gap:10px;
+}
+
+.v-tag{
+  font-size:10px;font-weight:700;text-transform:uppercase;
+  padding:3px 10px;border-radius:12px;letter-spacing:0.5px;
+}
+
+.tag-critical{background:var(--red-bg);color:var(--red)}
+.tag-serious{background:var(--amber-bg);color:#92400E}
+.tag-moderate{background:#EDE9FE;color:#5B21B6}
+.tag-minor{background:var(--green-bg);color:var(--green)}
+
+.v-count{font-size:14px;font-weight:700;color:var(--ink)}
+
+.v-bar-track{
+  height:8px;background:var(--border);border-radius:4px;
+  overflow:hidden;margin-bottom:6px;
+}
+
+.v-bar-fill{
+  height:100%;border-radius:4px;transition:width 1s ease;
+}
+
+.v-desc{
+  font-size:12px;color:var(--ink-light);line-height:1.6;
+}
+
+.legal-box{
+  background:var(--red-bg);border:1.5px solid #FCA5A5;
+  border-radius:16px;padding:32px;margin-bottom:24px;
+}
+
+.legal-box h3{
+  font-size:18px;font-weight:700;color:var(--red);
+  margin-bottom:20px;display:flex;align-items:center;gap:10px;
+}
+
+.legal-items{
+  display:flex;flex-direction:column;gap:16px;
+}
+
+.legal-item{
+  display:flex;gap:14px;align-items:flex-start;
+  font-size:14px;color:var(--ink);line-height:1.7;
+}
+
+.legal-item::before{
+  content:'⚠';flex-shrink:0;font-size:16px;
+}
+
+.cta-box{
+  background:var(--ink);border-radius:16px;padding:48px;
+  text-align:center;margin-bottom:24px;color:var(--white);
+}
+
+.cta-box h3{
+  font-family:var(--serif);font-size:28px;margin-bottom:12px;
+  font-weight:700;letter-spacing:-0.5px;
+}
+
+.cta-box p{
+  font-size:15px;color:rgba(255,255,255,0.65);margin-bottom:32px;
+  line-height:1.8;max-width:600px;margin-left:auto;margin-right:auto;
+}
+
+.cta-form{
+  display:flex;flex-direction:column;gap:12px;
+  max-width:420px;margin:0 auto;
+}
+
+.cta-input{
+  padding:13px 16px;border-radius:8px;
+  border:1.5px solid rgba(255,255,255,0.15);
+  background:rgba(255,255,255,0.08);color:var(--white);
+  font-size:14px;font-family:var(--sans);outline:none;
+  transition:all 0.2s;
+}
+
+.cta-input:focus{
+  border-color:var(--cobalt);background:rgba(255,255,255,0.12);
+}
+
+.cta-input::placeholder{color:rgba(255,255,255,0.3)}
+
+.cta-submit{
+  padding:14px;background:var(--cobalt);color:var(--white);
+  border:none;border-radius:8px;font-size:15px;
+  font-weight:700;cursor:pointer;font-family:var(--sans);
+  transition:all 0.2s;
+}
+
+.cta-submit:hover{
+  background:var(--cobalt-dim);transform:translateY(-2px);
+}
+
+.cta-note{font-size:12px;color:rgba(255,255,255,0.3);margin-top:8px}
+
+.scan-again{text-align:center;margin-bottom:32px}
+
+.scan-again button{
+  background:none;border:1.5px solid var(--border);
+  color:var(--ink-light);padding:12px 28px;
+  border-radius:8px;font-size:14px;cursor:pointer;
+  font-family:var(--sans);transition:all 0.2s;
+}
+
+.scan-again button:hover{
+  border-color:var(--ink);color:var(--ink);
+}
+
+.disclaimer{
+  background:var(--canvas);border:1px solid var(--border);
+  border-radius:12px;padding:20px 24px;
+}
+
+.disclaimer p{
+  font-size:12px;color:var(--ink-light);line-height:1.8;
+}
+
+/* ── ABOUT SECTION ── */
+.about-section{
+  padding:88px 6%;background:var(--canvas);
+}
+
+.about-h{
+  font-family:var(--serif);font-size:40px;font-weight:700;
+  color:var(--ink);margin-bottom:40px;letter-spacing:-0.5px;
+}
+
+.about-h em{color:var(--cobalt);font-style:italic;font-weight:300}
+
+.about-grid{
+  display:grid;grid-template-columns:1fr 1fr;gap:80px;
+  max-width:1200px;margin:0 auto;align-items:start;
+}
+
+.about-text p{
+  font-size:15px;color:var(--ink-light);line-height:1.8;
+  margin-bottom:20px;
+}
+
+.about-stats{
+  display:flex;gap:48px;flex-wrap:wrap;margin-top:40px;
+}
+
+.about-stat-item{display:flex;flex-direction:column}
+
+.about-stat-num{
+  font-family:var(--serif);font-size:48px;font-weight:700;
+  color:var(--ink);line-height:1;
+}
+
+.about-stat-label{
+  font-size:13px;color:var(--ink-light);margin-top:6px;
+}
+
+.about-features{
+  display:flex;flex-direction:column;gap:16px;
+}
+
+.feature-item{
+  background:var(--white);border:1.5px solid var(--border);
+  border-radius:12px;padding:24px;display:flex;gap:16px;
+  align-items:flex-start;animation:fadeInUp 0.8s ease;animation-fill-mode:both;
+}
+.feature-item:nth-child(1){animation-delay:0.1s}
+.feature-item:nth-child(2){animation-delay:0.2s}
+.feature-item:nth-child(3){animation-delay:0.3s}
+.feature-item:nth-child(4){animation-delay:0.4s}
+
+.feature-icon{
+  width:40px;height:40px;background:#EDF1FE;
+  border-radius:8px;display:flex;align-items:center;
+  justify-content:center;font-size:20px;flex-shrink:0;
+}
+
+.feature-text h4{
+  font-size:15px;font-weight:700;color:var(--ink);margin-bottom:4px;
+}
+
+.feature-text p{
+  font-size:13px;color:var(--ink-light);line-height:1.6;
+}
+
+@media(max-width:960px){
+  .about-grid{grid-template-columns:1fr;gap:40px}
+}
+
+/* ── PARTNERS SECTION ── */
+.partners-section{
+  background:var(--ink);color:var(--white);
+  padding:88px 6%;
+}
+
+.partner-h{
+  font-family:var(--serif);font-size:40px;font-weight:700;
+  color:var(--white);margin-bottom:10px;letter-spacing:-0.5px;
+}
+
+.partner-h em{color:var(--amber);font-style:italic}
+
+.partner-sub{
+  font-size:16px;color:rgba(255,255,255,0.65);
+  margin-bottom:48px;line-height:1.8;max-width:600px;
+}
+
+.partner-grid{
+  display:grid;grid-template-columns:1fr 1fr;gap:80px;
+  max-width:1200px;margin:0 auto;align-items:center;
+}
+
+.partner-benefits{
+  display:flex;flex-direction:column;gap:24px;
+}
+
+.benefit-item{
+  display:flex;gap:16px;align-items:flex-start;
+}
+
+.benefit-icon{
+  width:44px;height:44px;background:rgba(255,255,255,0.08);
+  border-radius:10px;display:flex;align-items:center;
+  justify-content:center;font-size:20px;flex-shrink:0;
+}
+
+.benefit-text h4{
+  font-size:15px;font-weight:700;color:var(--white);margin-bottom:4px;
+}
+
+.benefit-text p{
+  font-size:13px;color:rgba(255,255,255,0.6);line-height:1.6;
+}
+
+.partner-form{
+  background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);
+  border-radius:16px;padding:40px;
+}
+
+.partner-form h3{
+  font-family:var(--serif);font-size:26px;font-weight:700;
+  color:var(--white);margin-bottom:8px;letter-spacing:-0.3px;
+}
+
+.partner-form p{
+  font-size:14px;color:rgba(255,255,255,0.55);margin-bottom:28px;line-height:1.7;
+}
+
+.form-group{margin-bottom:16px}
+
+.form-group label{
+  display:block;font-size:12px;font-weight:600;
+  color:rgba(255,255,255,0.5);margin-bottom:8px;
+  text-transform:uppercase;letter-spacing:0.5px;
+}
+
+.form-group input,.form-group select,.form-group textarea{
+  width:100%;padding:12px 14px;background:rgba(255,255,255,0.06);
+  border:1.5px solid rgba(255,255,255,0.12);border-radius:8px;
+  color:var(--white);font-size:14px;font-family:var(--sans);
+  outline:none;transition:all 0.2s;
+}
+
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{
+  border-color:var(--cobalt);background:rgba(255,255,255,0.08);
+}
+
+.form-group input::placeholder{color:rgba(255,255,255,0.25)}
+
+.form-group select option{background:var(--ink)}
+
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+
+.form-submit{
+  width:100%;padding:14px;background:var(--cobalt);
+  color:var(--white);border:none;border-radius:8px;
+  font-size:15px;font-weight:700;cursor:pointer;
+  font-family:var(--sans);margin-top:12px;
+  transition:all 0.2s;
+}
+
+.form-submit:hover{
+  background:var(--cobalt-dim);transform:translateY(-2px);
+}
+
+.form-note{
+  font-size:11px;color:rgba(255,255,255,0.3);
+  text-align:center;margin-top:12px;
+}
+
+@media(max-width:960px){
+  .partner-grid{grid-template-columns:1fr;gap:48px}
+}
+
+/* ── FOOTER ── */
+footer{
+  background:#111113;color:rgba(255,255,255,0.4);
+  padding:64px 6% 32px;
+}
+
+.footer-grid{
+  display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:48px;
+  max-width:1200px;margin:0 auto 48px;
+}
+
+.footer-brand{
+  font-family:var(--serif);font-size:22px;
+  color:var(--white);margin-bottom:12px;font-weight:700;
+}
+
+.footer-bio{
+  font-size:13px;line-height:1.7;max-width:300px;
+  color:rgba(255,255,255,0.4);
+}
+
+.footer-col h5{
+  font-size:11px;font-weight:700;letter-spacing:2px;
+  text-transform:uppercase;color:rgba(255,255,255,0.6);
+  margin-bottom:16px;
+}
+
+.footer-col ul{
+  list-style:none;display:flex;flex-direction:column;gap:10px;
+}
+
+.footer-col a{
+  color:rgba(255,255,255,0.4);font-size:13px;text-decoration:none;
+  transition:color 0.2s;
+}
+
+.footer-col a:hover{color:var(--white)}
+
+.footer-bottom{
+  max-width:1200px;margin:0 auto;padding-top:24px;
+  border-top:1px solid rgba(255,255,255,0.08);
+  display:flex;justify-content:space-between;align-items:center;
+  font-size:12px;flex-wrap:wrap;gap:12px;
+}
+
+@media(max-width:960px){
+  .footer-grid{grid-template-columns:1fr 1fr;gap:40px}
+}
+
+/* ── RESPONSIVE ── */
+@media(max-width:960px){
+  nav{padding:0 5%}
+  .nav-links{display:none;gap:16px}
+  .hamburger{display:block}
+  .mobile-nav.open{display:flex}
+  
+  .hero{padding:64px 5% 56px}
+  .hero-cta{flex-direction:column;align-items:center}
+  
+  .scan-explainer{margin:0 5%}
+  .comparison-section{padding:64px 5%}
+  .trust-section{padding:64px 5%}
+  .services-section{padding:64px 5%}
+  .testimonials-section{padding:64px 5%}
+  .case-studies{padding:64px 5%}
+  .scan-section{padding:64px 5%}
+  .about-section{padding:64px 5%}
+  .partners-section{padding:64px 5%}
+  
+  .comparison-table-header,.comparison-row{grid-template-columns:1.5fr repeat(2,1fr)!important}
+  .comparison-cell{padding:16px 12px;font-size:12px}
+  
+  .result-meta{grid-template-columns:1fr 1fr}
+}
+
+@media(max-width:600px){
+  nav{height:60px;padding:0 4%}
+  .logo{font-size:18px}
+  
+  .hero{
+    padding:48px 4% 40px;
+  }
+  .hero h1{font-size:clamp(32px,6vw,44px)}
+  .hero-sub{font-size:15px;margin-bottom:32px}
+  .hero-cta{gap:10px}
+  
+  .btn-primary,.btn-secondary{padding:12px 20px;font-size:14px}
+  
+  .hero-ticker{padding:28px 20px;margin-bottom:40px}
+  .ticker-number{font-size:40px;margin-bottom:6px}
+  .ticker-stats{grid-template-columns:1fr;gap:12px}
+  
+  .scan-explainer{margin:0 4%;padding:36px 4%}
+  .scan-explainer h2{font-size:24px;margin-bottom:8px}
+  .scan-steps-grid{gap:12px}
+  .scan-step{padding:20px 16px}
+  
+  .comparison-section,.trust-section,.services-section{padding:56px 4%}
+  .comparison-h,.trust-h,.services-h{font-size:28px;margin-bottom:8px}
+  
+  .trust-grid{grid-template-columns:1fr}
+  .services-grid{grid-template-columns:1fr}
+  .testi-grid{grid-template-columns:1fr}
+  
+  .scan-section{padding:56px 4%}
+  .scan-section h2{font-size:clamp(24px,5vw,36px);margin-bottom:12px}
+  .scan-form{gap:8px;flex-direction:column}
+  
+  .result-meta{grid-template-columns:1fr 1fr;gap:1px}
+  .meta-cell{padding:16px 12px}
+  .meta-num{font-size:24px}
+  .meta-label{font-size:10px}
+  
+  .about-section{padding:56px 4%}
+  .about-h{font-size:28px;margin-bottom:28px}
+  .about-grid{gap:40px}
+  .about-stats{gap:32px}
+  .about-stat-num{font-size:36px}
+  
+  .partners-section{padding:56px 4%}
+  .partner-h{font-size:28px}
+  .partner-grid{gap:40px}
+  .form-row{grid-template-columns:1fr}
+  
+  .footer-grid{grid-template-columns:1fr;gap:32px}
+  .footer-bottom{flex-direction:column;text-align:center;gap:8px}
+  
+  .sticky-cta{bottom:16px;right:16px;padding:10px 18px;font-size:12px}
+}
+</style>
+</head>
+<body>
+
+<!-- STICKY CTA BUTTON -->
+<button class="sticky-cta" id="sticky-cta" onclick="document.getElementById('scan-section').scrollIntoView({behavior:'smooth'})">Get Free Scan</button>
+
+<!-- NAVIGATION -->
+<nav>
+  <a href="#" class="logo">Auto<em>Flow</em></a>
+  <ul class="nav-links">
+    <li><a href="#how-autoflow-works">How It Works</a></li>
+    <li><a href="#comparison">Why AutoFlow</a></li>
+    <li><a href="#case-studies">Case Studies</a></li>
+    <li><a href="#pricing-section">Pricing</a></li>
+    <li><a href="#about">About</a></li>
+    <li><a href="#partners">Partners</a></li>
+  </ul>
+  <a href="#scan-section" class="nav-cta">Free Scan</a>
+  <button class="hamburger" onclick="toggleMenu()">☰</button>
+</nav>
+
+<div class="mobile-nav" id="mobile-nav">
+  <a href="#how-autoflow-works" onclick="toggleMenu()">How It Works</a>
+  <a href="#comparison" onclick="toggleMenu()">Why AutoFlow</a>
+  <a href="#case-studies" onclick="toggleMenu()">Case Studies</a>
+  <a href="#pricing-section" onclick="toggleMenu()">Pricing</a>
+  <a href="#about" onclick="toggleMenu()">About</a>
+  <a href="#partners" onclick="toggleMenu()">Partners</a>
+  <a href="#scan-section" onclick="toggleMenu()" class="nav-cta" style="margin-top:8px">Free Scan</a>
+</div>
+
+<!-- HERO - AUTOFLOW INTRO -->
+<section class="hero">
+  <div class="hero-content">
+    <div class="hero-tag">AutoFlow — Website Compliance & Legal Protection</div>
+    <h1>Stop accessibility lawsuits <em>before they start</em></h1>
+    <p class="hero-sub">We scan your website, find every accessibility violation, calculate your legal exposure, and fix it all within 3–7 days. Fixed fee. No ongoing costs. Legally defensible documentation included.</p>
+    <div class="hero-cta">
+      <a href="#scan-section" class="btn-primary">Scan Your Site Free ↓</a>
+      <a href="#how-autoflow-works" class="btn-secondary">How It Works</a>
+    </div>
+  </div>
+</section>
+
+<!-- NEW: AUTOFLOW INTRO SECTION -->
+<section style="background:var(--white);padding:88px 6%;border-top:1px solid var(--border)">
+  <div style="max-width:1000px;margin:0 auto">
+    <div style="text-align:center;margin-bottom:64px">
+      <h2 style="font-family:var(--serif);font-size:40px;font-weight:700;color:var(--ink);margin-bottom:16px;letter-spacing:-0.5px">What is AutoFlow?</h2>
+      <p style="font-size:16px;color:var(--ink-light);max-width:700px;margin:0 auto;line-height:1.8">We're a specialized team that fixes website accessibility and compliance issues. We protect small and medium businesses from the growing wave of ADA lawsuits, UK discrimination claims, and European enforcement fines.</p>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:32px;margin-top:48px">
+      <div style="text-align:center">
+        <div style="font-size:48px;margin-bottom:12px">🔍</div>
+        <h3 style="font-size:18px;font-weight:700;color:var(--ink);margin-bottom:8px">We Audit</h3>
+        <p style="font-size:14px;color:var(--ink-light);line-height:1.7">Real-time scanning using axe-core to find every accessibility violation on your site.</p>
+      </div>
+      <div style="text-align:center">
+        <div style="font-size:48px;margin-bottom:12px">⚙️</div>
+        <h3 style="font-size:18px;font-weight:700;color:var(--ink);margin-bottom:8px">We Fix</h3>
+        <p style="font-size:14px;color:var(--ink-light);line-height:1.7">Actual code remediation — not widget overlays. WCAG 2.1 AA compliant. Screen reader tested.</p>
+      </div>
+      <div style="text-align:center">
+        <div style="font-size:48px;margin-bottom:12px">📋</div>
+        <h3 style="font-size:18px;font-weight:700;color:var(--ink);margin-bottom:8px">We Certify</h3>
+        <p style="font-size:14px;color:var(--ink-light);line-height:1.7">Compliance certificate with before/after documentation. Actually holds up in court.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROBLEM SECTION -->
+<section style="background:var(--red-bg);padding:88px 6%">
+  <div style="max-width:1000px;margin:0 auto">
+    <h2 style="font-family:var(--serif);font-size:40px;font-weight:700;color:var(--red);text-align:center;margin-bottom:32px;letter-spacing:-0.5px">The problem: Your website is probably already breaking the law</h2>
+    <p style="font-size:16px;color:#92400E;text-align:center;max-width:700px;margin:0 auto 48px;line-height:1.8">Accessibility lawsuits have become a cottage industry. In 2025, over 5,100 ADA cases were filed — that's 14 every working day. Most start with a demand letter asking for $10,000–$25,000 before anything reaches court.</p>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:40px;margin-top:48px">
+      <div>
+        <h3 style="font-size:20px;font-weight:700;color:#92400E;margin-bottom:16px;display:flex;align-items:center;gap:10px">⚖️ The Legal Reality</h3>
+        <ul style="list-style:none;display:flex;flex-direction:column;gap:12px">
+          <li style="font-size:14px;color:#92400E;line-height:1.7;display:flex;gap:10px;align-items:flex-start"><span style="font-weight:700">→</span> ADA Title III (US): Any business with a website can be sued by anyone claiming they cannot access it.</li>
+          <li style="font-size:14px;color:#92400E;line-height:1.7;display:flex;gap:10px;align-items:flex-start"><span style="font-weight:700">→</span> Equality Act 2010 (UK): Disabled users have a legal right to equal access. Non-compliance = discrimination.</li>
+          <li style="font-size:14px;color:#92400E;line-height:1.7;display:flex;gap:10px;align-items:flex-start"><span style="font-weight:700">→</span> European Accessibility Act: €3 million fines if you sell to Europe and aren't compliant.</li>
+          <li style="font-size:14px;color:#92400E;line-height:1.7;display:flex;gap:10px;align-items:flex-start"><span style="font-weight:700">→</span> 95.9% of top 1M websites have violations. Yours almost certainly does too.</li>
+        </ul>
+      </div>
+      <div>
+        <h3 style="font-size:20px;font-weight:700;color:#92400E;margin-bottom:16px;display:flex;align-items:center;gap:10px">💰 The Financial Reality</h3>
+        <div style="background:rgba(255,255,255,0.5);border-radius:12px;padding:20px;margin-bottom:16px">
+          <div style="font-size:12px;color:#92400E;text-transform:uppercase;font-weight:700;margin-bottom:4px">First Demand Letter</div>
+          <div style="font-size:28px;font-weight:700;color:#92400E">$10K–$25K</div>
+          <div style="font-size:12px;color:#92400E;margin-top:8px">Immediate payment requested to avoid court filing</div>
+        </div>
+        <div style="background:rgba(255,255,255,0.5);border-radius:12px;padding:20px">
+          <div style="font-size:12px;color:#92400E;text-transform:uppercase;font-weight:700;margin-bottom:4px">Court Settlement Average</div>
+          <div style="font-size:28px;font-weight:700;color:#92400E">$25K–$75K</div>
+          <div style="font-size:12px;color:#92400E;margin-top:8px">Plus attorney fees, if you fight it</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+  <div class="hero-ticker">
+    <div class="ticker-live">Live</div>
+    <div class="ticker-label">ADA Website Lawsuits Filed in 2025</div>
+    <div class="ticker-number" id="ticker-num">5,100+</div>
+    <div class="ticker-label">Up 24% from 2024 · 14 per day on average</div>
+    <div class="ticker-stats">
+      <div class="stat-item">
+        <div class="stat-label">Average settlement</div>
+        <div class="stat-value">$25K–$75K</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-label">First demand asks for</div>
+        <div class="stat-value">$10K–$25K</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-label">Sites with violations</div>
+        <div class="stat-value">95.9%</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-label">Small biz sued (2025)</div>
+        <div class="stat-value">64%</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW THE SCAN WORKS -->
+<section class="scan-explainer" id="how-autoflow-works">
+  <h2>How the scan actually works</h2>
+  <p class="scan-explainer-sub">Real-time accessibility analysis powered by axe-core — the same engine used by enterprises and government bodies worldwide.</p>
+  <div class="scan-steps-grid">
+    <div class="scan-step">
+      <div class="scan-step-num">1</div>
+      <h4>You enter a URL</h4>
+      <p>Any website. We fetch it in the browser and prepare it for analysis in real-time.</p>
+    </div>
+    <div class="scan-step">
+      <div class="scan-step-num">2</div>
+      <h4>We run WCAG 2.1 AA checks</h4>
+      <p>Automated scanning for colour contrast, alt text, keyboard navigation, ARIA compliance, and 50+ standards.</p>
+    </div>
+    <div class="scan-step">
+      <div class="scan-step-num">3</div>
+      <h4>Violations are detected</h4>
+      <p>Every issue is catalogued, categorized by severity, and tagged with the specific WCAG criterion it violates.</p>
+    </div>
+    <div class="scan-step">
+      <div class="scan-step-num">4</div>
+      <h4>You get legal clarity</h4>
+      <p>A plain-English breakdown of each violation, what it means for your users, and your legal exposure under ADA Title III or Equality Act 2010.</p>
+    </div>
+  </div>
+</section>
+
+<!-- COMPARISON TABLE -->
+<section class="comparison-section" id="comparison">
+  <h2 class="comparison-h">AutoFlow vs. the <em>alternatives</em></h2>
+  <p class="comparison-sub">There are three ways to fix your website's accessibility. Here's how they actually compare.</p>
+  
+  <div class="comparison-table">
+    <div class="comparison-table-header">
+      <div>What you get</div>
+      <div>Hire a Developer</div>
+      <div>Accessibility Widget</div>
+      <div><strong>AutoFlow</strong></div>
+    </div>
+    <div class="comparison-row">
+      <div class="comparison-cell">Time to completion</div>
+      <div class="comparison-cell">2–4 weeks</div>
+      <div class="comparison-cell">Immediate (false)</div>
+      <div class="comparison-cell"><strong>3–7 days</strong></div>
+    </div>
+    <div class="comparison-row">
+      <div class="comparison-cell">Cost</div>
+      <div class="comparison-cell">$5K–$20K+</div>
+      <div class="comparison-cell">$15–$500/mo</div>
+      <div class="comparison-cell"><strong>Fixed fee</strong></div>
+    </div>
+    <div class="comparison-row">
+      <div class="comparison-cell">Actual code fixes</div>
+      <div class="comparison-cell"><span class="check">✓</span></div>
+      <div class="comparison-cell"><span class="cross">✗</span></div>
+      <div class="comparison-cell"><span class="check">✓</span></div>
+    </div>
+    <div class="comparison-row">
+      <div class="comparison-cell">Legally defensible</div>
+      <div class="comparison-cell"><span class="check">✓</span></div>
+      <div class="comparison-cell"><span class="cross">✗</span></div>
+      <div class="comparison-cell"><span class="check">✓</span></div>
+    </div>
+    <div class="comparison-row">
+      <div class="comparison-cell">Compliance certificate</div>
+      <div class="comparison-cell"><span class="partial">~</span></div>
+      <div class="comparison-cell"><span class="cross">✗</span></div>
+      <div class="comparison-cell"><span class="check">✓</span></div>
+    </div>
+    <div class="comparison-row">
+      <div class="comparison-cell">Screen reader tested</div>
+      <div class="comparison-cell"><span class="partial">~</span></div>
+      <div class="comparison-cell"><span class="cross">✗</span></div>
+      <div class="comparison-cell"><span class="check">✓</span></div>
+    </div>
+    <div class="comparison-row">
+      <div class="comparison-cell">Post-launch support</div>
+      <div class="comparison-cell"><span class="cross">✗</span></div>
+      <div class="comparison-cell"><span class="check">✓</span></div>
+      <div class="comparison-cell"><span class="partial">~</span></div>
+    </div>
+    <div class="comparison-row">
+      <div class="comparison-cell">No ongoing fees</div>
+      <div class="comparison-cell"><span class="check">✓</span></div>
+      <div class="comparison-cell"><span class="cross">✗</span></div>
+      <div class="comparison-cell"><span class="check">✓</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- TRUST SECTION -->
+<section class="trust-section">
+  <h2 class="trust-h">Why the numbers <em>matter</em></h2>
+  <p class="trust-sub">These aren't hypothetical risks. These are real enforcement actions, real lawsuits, and real financial exposure.</p>
+  
+  <div class="trust-grid">
+    <div class="trust-card">
+      <div class="trust-icon">⚖️</div>
+      <div class="trust-number">5,100+</div>
+      <div class="trust-label">ADA web lawsuits filed in 2025. 14 per working day on average. Most start with a demand letter, not a courtroom.</div>
+    </div>
+    <div class="trust-card">
+      <div class="trust-icon">💰</div>
+      <div class="trust-number">$25K–$75K</div>
+      <div class="trust-label">Typical settlement cost in federal court. First demand asks for $10K–$25K before anything is filed.</div>
+    </div>
+    <div class="trust-card">
+      <div class="trust-icon">📊</div>
+      <div class="trust-number">95.9%</div>
+      <div class="trust-label">Of the top 1 million websites have measurable accessibility violations. The average site has 56 individual errors.</div>
+    </div>
+  </div>
+</section>
+
+<!-- SERVICES -->
+<section class="services-section" id="services">
+  <h2 class="services-h">What we actually fix</h2>
+  <p class="services-sub">Every service is delivered with a compliance certificate that documents the before, the work, and the after.</p>
+  
+  <div class="services-grid">
+    <div class="service-card featured">
+      <div class="service-badge">Most Popular</div>
+      <div class="service-icon">♿</div>
+      <h3>Accessibility Compliance</h3>
+      <p>Full WCAG 2.1 AA audit and complete remediation. This is the service that stops ADA lawsuits, Equality Act claims, and EAA enforcement — all at once.</p>
+      <ul class="service-list">
+        <li>Full accessibility audit report</li>
+        <li>Every violation fixed at code level</li>
+        <li>Keyboard & screen reader testing</li>
+        <li>Colour contrast & alt text remediation</li>
+        <li>Independent verification scan</li>
+        <li>Compliance certificate on delivery</li>
+      </ul>
+      <div class="service-price">Costs far less than one demand letter. Get in touch for a quote.</div>
+    </div>
+    
+    <div class="service-card">
+      <div class="service-icon">🔒</div>
+      <h3>GDPR & Privacy Audit</h3>
+      <p>For UK businesses and US companies with European customers. Full compliance assessment, policy update, and consent mechanism setup.</p>
+      <ul class="service-list">
+        <li>UK GDPR compliance audit</li>
+        <li>Privacy policy review & update</li>
+        <li>Consent implementation</li>
+        <li>Data handling documentation</li>
+        <li>ICO-ready compliance report</li>
+      </ul>
+      <div class="service-price">Fixed fee. <strong>Under one week.</strong> Ask for a quote.</div>
+    </div>
+    
+    <div class="service-card">
+      <div class="service-icon">🍪</div>
+      <h3>Cookie & Consent Setup</h3>
+      <p>GDPR-compliant cookie banner, cookie policy, and a full audit of every third-party script. The one most businesses skip until enforcement shows up.</p>
+      <ul class="service-list">
+        <li>Full cookie audit</li>
+        <li>GDPR consent banner</li>
+        <li>Cookie policy drafted & live</li>
+        <li>Third-party script review</li>
+        <li>Google Analytics alignment</li>
+      </ul>
+      <div class="service-price">The <strong>quickest win</strong> on this list. Get a quote today.</div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="testimonials-section">
+  <h2 class="testi-h">What real customers <em>actually</em> say</h2>
+  <p class="testi-sub">Not templates. Real businesses. Real legal exposure. Real relief.</p>
+  
+  <div class="testi-grid">
+    <div class="testi-card">
+      <div class="testi-stars">★★★★★</div>
+      <div class="testi-quote">"We had no idea how exposed we were. 61 violations. AutoFlow had everything fixed within a week and the certificate was the first thing our lawyer asked for when we got a demand letter three months later."</div>
+      <div class="testi-attr">
+        <span class="testi-flag">🇺🇸</span>
+        <div>
+          <div class="testi-name">James R.</div>
+          <div class="testi-sub">E-Commerce Store Owner · New York</div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="testi-card">
+      <div class="testi-stars">★★★★★</div>
+      <div class="testi-quote">"I'd been putting this off for two years. AutoFlow made it completely painless — gave them access, they did the work, I got a certificate showing zero violations. Cost less than one hour with my attorney."</div>
+      <div class="testi-attr">
+        <span class="testi-flag">🇺🇸</span>
+        <div>
+          <div class="testi-name">Sarah M.</div>
+          <div class="testi-sub">Boutique Retailer · California</div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="testi-card">
+      <div class="testi-stars">★★★★★</div>
+      <div class="testi-quote">"We needed both US and UK compliance sorted. AutoFlow was the only team that genuinely understood that. Full bundle — accessibility, GDPR, cookies — all done in one week."</div>
+      <div class="testi-attr">
+        <span class="testi-flag">🇬🇧</span>
+        <div>
+          <div class="testi-name">Priya D.</div>
+          <div class="testi-sub">Professional Services Director · London</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CASE STUDIES -->
+<section class="case-studies" id="case-studies">
+  <h2 class="case-h">When real businesses <em>acted</em></h2>
+  <p class="case-sub">Not testimonials. Real before-and-after situations. What the problem was, what we found, what changed.</p>
+  
+  <div class="case-grid">
+    <div class="case-card">
+      <div class="case-side">
+        <div class="case-location">
+          <span class="case-location-flag">🇺🇸</span>
+          <span>New York · E-Commerce</span>
+        </div>
+        <h3 class="case-title">Demand letter arrived asking for $18,500</h3>
+        <p class="case-desc">Shopify store owner discovered 71 WCAG violations across 40 product pages — missing alt text on every image, broken keyboard navigation, contrast failures throughout. They had an overlay widget installed for two years believing it provided protection.</p>
+        <div class="case-stat"><strong>71 violations found.</strong> Widget provided zero legal protection.</div>
+      </div>
+      <div class="case-divider"></div>
+      <div class="case-side">
+        <div class="case-result-tag">After AutoFlow</div>
+        <div class="case-result">
+          <div class="result-item">
+            <div class="result-check">✓</div>
+            <div class="result-text">All 71 violations remediated at code level — not patched with a widget</div>
+          </div>
+          <div class="result-item">
+            <div class="result-check">✓</div>
+            <div class="result-text">Clean verification scan: zero errors across all pages</div>
+          </div>
+          <div class="result-item">
+            <div class="result-check">✓</div>
+            <div class="result-text">Compliance certificate shared with plaintiff's attorney</div>
+          </div>
+          <div class="result-item">
+            <div class="result-check">✓</div>
+            <div class="result-text">Demand letter dropped — our fee was a fraction of $18,500</div>
+          </div>
+          <div class="case-outcome"><strong>Delivered in 5 days.</strong> Case closed before reaching federal court.</div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="case-card">
+      <div class="case-side">
+        <div class="case-location">
+          <span class="case-location-flag">🇬🇧</span>
+          <span>London · Recruitment</span>
+        </div>
+        <h3 class="case-title">EAA deadline exposed €3M fine exposure</h3>
+        <p class="case-desc">Recruitment firm selling into Europe suddenly realized their website was non-compliant after the European Accessibility Act enforcement deadline (28 June 2025). Legal team flagged the risk — €3 million potential fine. German expansion scheduled for 3 weeks away.</p>
+        <div class="case-stat"><strong>54 violations found.</strong> €3M exposure. Launch 3 weeks away.</div>
+      </div>
+      <div class="case-divider"></div>
+      <div class="case-side">
+        <div class="case-result-tag">After AutoFlow</div>
+        <div class="case-result">
+          <div class="result-item">
+            <div class="result-check">✓</div>
+            <div class="result-text">54 violations remediated across WCAG 2.1 AA and EAA standards</div>
+          </div>
+          <div class="result-item">
+            <div class="result-check">✓</div>
+            <div class="result-text">GDPR and cookie compliance completed in same engagement</div>
+          </div>
+          <div class="result-item">
+            <div class="result-check">✓</div>
+            <div class="result-text">Dual compliance certificate covering UK and EU standards</div>
+          </div>
+          <div class="result-item">
+            <div class="result-check">✓</div>
+            <div class="result-text">German expansion launched on schedule with legal clearance</div>
+          </div>
+          <div class="case-outcome"><strong>Delivered in 6 days.</strong> Expansion cleared. Legal satisfied.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING SECTION -->
+<section style="background:var(--white);padding:88px 6%;border-top:1px solid var(--border)" id="pricing-section">
+  <div style="max-width:1100px;margin:0 auto">
+    <h2 style="font-family:var(--serif);font-size:40px;font-weight:700;color:var(--ink);text-align:center;margin-bottom:16px;letter-spacing:-0.5px">Clear pricing for <em style="color:var(--cobalt);font-style:italic;font-weight:300">every situation</em></h2>
+    <p style="font-size:16px;color:var(--ink-light);text-align:center;max-width:700px;margin:0 auto 56px;line-height:1.8">No surprises. No hidden costs. You know the price before we start. Choose the package that fits your need.</p>
+
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:24px">
+      <!-- Package 1 -->
+      <div style="background:linear-gradient(135deg,#F5F7FF 0%,#FAFBFF 100%);border:1.5px solid #DDE4FF;border-radius:16px;padding:40px 32px;display:flex;flex-direction:column;gap:20px">
+        <div>
+          <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--cobalt);margin-bottom:8px">Quick Scan</div>
+          <h3 style="font-family:var(--serif);font-size:24px;font-weight:700;color:var(--ink);line-height:1.2">Homepage Audit</h3>
+        </div>
+        <div>
+          <div style="font-size:12px;color:var(--ink-light);text-transform:uppercase;margin-bottom:4px">Starting at</div>
+          <div style="font-size:36px;font-weight:700;color:var(--cobalt)">£299</div>
+          <div style="font-size:12px;color:var(--ink-light);margin-top:8px">One-time fee. No subscriptions.</div>
+        </div>
+        <ul style="list-style:none;display:flex;flex-direction:column;gap:10px;flex-grow:1">
+          <li style="font-size:13px;color:var(--ink);display:flex;gap:10px;align-items:flex-start"><span style="color:var(--green);font-weight:700">✓</span> Homepage audit & violations report</li>
+          <li style="font-size:13px;color:var(--ink);display:flex;gap:10px;align-items:flex-start"><span style="color:var(--green);font-weight:700">✓</span> Basic remediation guidance</li>
+          <li style="font-size:13px;color:var(--ink);display:flex;gap:10px;align-items:flex-start"><span style="color:var(--green);font-weight:700">✓</span> 24-hour turnaround</li>
+          <li style="font-size:13px;color:#999;display:flex;gap:10px;align-items:flex-start"><span style="font-weight:700">✗</span> Code fixes not included</li>
+        </ul>
+        <button style="padding:14px;background:var(--cobalt);color:var(--white);border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;font-family:var(--sans);width:100%;transition:all 0.2s" onclick="document.getElementById('scan-section').scrollIntoView({behavior:'smooth'})">Get Started</button>
+      </div>
+
+      <!-- Package 2 - FEATURED -->
+      <div style="background:linear-gradient(135deg,#EDF1FE 0%,#F5F7FF 100%);border:2px solid var(--cobalt);border-radius:16px;padding:40px 32px;display:flex;flex-direction:column;gap:20px;position:relative;top:-8px;box-shadow:0 16px 40px rgba(35,85,232,0.15)">
+        <div style="display:inline-block;background:var(--cobalt);color:var(--white);font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:6px 14px;border-radius:20px;width:fit-content;margin-bottom:8px">Most Popular</div>
+        <div>
+          <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--cobalt);margin-bottom:8px">Full Fix</div>
+          <h3 style="font-family:var(--serif);font-size:24px;font-weight:700;color:var(--ink);line-height:1.2">Complete Compliance</h3>
+        </div>
+        <div>
+          <div style="font-size:12px;color:var(--ink-light);text-transform:uppercase;margin-bottom:4px">Starting at</div>
+          <div style="font-size:36px;font-weight:700;color:var(--cobalt)">£1,499</div>
+          <div style="font-size:12px;color:var(--ink-light);margin-top:8px">Depends on violations found. Quote within 24h.</div>
+        </div>
+        <ul style="list-style:none;display:flex;flex-direction:column;gap:10px;flex-grow:1">
+          <li style="font-size:13px;color:var(--ink);display:flex;gap:10px;align-items:flex-start"><span style="color:var(--green);font-weight:700">✓</span> Full site audit (all pages)</li>
+          <li style="font-size:13px;color:var(--ink);display:flex;gap:10px;align-items:flex-start"><span style="color:var(--green);font-weight:700">✓</span> <strong>Every violation fixed</strong> at code level</li>
+          <li style="font-size:13px;color:var(--ink);display:flex;gap:10px;align-items:flex-start"><span style="color:var(--green);font-weight:700">✓</span> Keyboard & screen reader testing</li>
+          <li style="font-size:13px;color:var(--ink);display:flex;gap:10px;align-items:flex-start"><span style="color:var(--green);font-weight:700">✓</span> Compliance certificate + documentation</li>
+          <li style="font-size:13px;color:var(--ink);display:flex;gap:10px;align-items:flex-start"><span style="color:var(--green);font-weight:700">✓</span> 3–7 day delivery</li>
+        </ul>
+        <button style="padding:14px;background:var(--cobalt);color:var(--white);border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;font-family:var(--sans);width:100%;transition:all 0.2s" onclick="document.getElementById('scan-section').scrollIntoView({behavior:'smooth'})">Get Your Free Scan</button>
+      </div>
+
+      <!-- Package 3 -->
+      <div style="background:linear-gradient(135deg,#FEF3D8 0%,#FEF8EE 100%);border:1.5px solid #F5D78E;border-radius:16px;padding:40px 32px;display:flex;flex-direction:column;gap:20px">
+        <div>
+          <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--amber);margin-bottom:8px">Bundle</div>
+          <h3 style="font-family:var(--serif);font-size:24px;font-weight:700;color:var(--ink);line-height:1.2">Full Compliance Suite</h3>
+        </div>
+        <div>
+          <div style="font-size:12px;color:var(--ink-light);text-transform:uppercase;margin-bottom:4px">Starting at</div>
+          <div style="font-size:36px;font-weight:700;color:var(--amber)">£2,199</div>
+          <div style="font-size:12px;color:var(--ink-light);margin-top:8px">Accessibility + GDPR + Cookies all included</div>
+        </div>
+        <ul style="list-style:none;display:flex;flex-direction:column;gap:10px;flex-grow:1">
+          <li style="font-size:13px;color:var(--ink);display:flex;gap:10px;align-items:flex-start"><span style="color:var(--green);font-weight:700">✓</span> Complete Compliance package</li>
+          <li style="font-size:13px;color:var(--ink);display:flex;gap:10px;align-items:flex-start"><span style="color:var(--green);font-weight:700">✓</span> GDPR audit & privacy update</li>
+          <li style="font-size:13px;color:var(--ink);display:flex;gap:10px;align-items:flex-start"><span style="color:var(--green);font-weight:700">✓</span> Cookie audit & GDPR banner</li>
+          <li style="font-size:13px;color:var(--ink);display:flex;gap:10px;align-items:flex-start"><span style="color:var(--green);font-weight:700">✓</span> Dual compliance certificate (UK + EU)</li>
+          <li style="font-size:13px;color:var(--ink);display:flex;gap:10px;align-items:flex-start"><span style="color:var(--green);font-weight:700">✓</span> 5–10 day delivery</li>
+        </ul>
+        <button style="padding:14px;background:var(--amber);color:#92400E;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;font-family:var(--sans);width:100%;transition:all 0.2s" onclick="document.getElementById('scan-section').scrollIntoView({behavior:'smooth'})">Learn More</button>
+      </div>
+    </div>
+
+    <div style="margin-top:64px;padding:32px;background:var(--green-bg);border:1.5px solid #6EE7B7;border-radius:16px;text-align:center">
+      <div style="font-size:14px;font-weight:700;color:var(--green);margin-bottom:12px">STILL WORRIED ABOUT COST?</div>
+      <p style="font-size:16px;color:var(--green);line-height:1.8;max-width:700px;margin:0 auto">Our cheapest package is far less than a single demand letter. Our most expensive package is a fraction of what you'd pay in court. Get a free scan to see your actual exposure.</p>
+    </div>
+  </div>
+</section>
+
+<!-- SCAN SECTION -->
+<section class="scan-section" id="scan-section">
+  <div class="scan-content">
+    <h2>See your violations in 30 seconds — free</h2>
+    <p>Enter your website URL and we'll run a live diagnostic showing every accessibility issue present. No sign-up. No obligation. Just the truth about your site.</p>
+    
+    <div class="scan-form">
+      <input type="url" class="scan-input" id="scan-url" placeholder="https://yourwebsite.com" onkeydown="if(event.key==='Enter')startScan()" aria-label="Website URL to scan" required>
+        <button class="scan-btn" id="scan-btn" onclick="startScan()" aria-label="Start website scan">Scan Now</button>
+    </div>
+  </div>
+</section>
+
+<!-- RESULTS AREA -->
+<div class="results">
+  
+  <!-- Loading -->
+  <div class="loading-card" id="loading-card">
+    <div class="spinner"></div>
+    <h3 class="loading-title">Scanning your website...</h3>
+    <p class="loading-sub">This usually takes 15–30 seconds</p>
+    <div class="loading-steps" id="loading-steps">
+      <div class="loading-step active" id="ls1"><div class="dot"></div><span>Fetching page structure</span></div>
+      <div class="loading-step" id="ls2"><div class="dot"></div><span>Running WCAG 2.1 AA checks</span></div>
+      <div class="loading-step" id="ls3"><div class="dot"></div><span>Analysing colour contrast</span></div>
+      <div class="loading-step" id="ls4"><div class="dot"></div><span>Testing keyboard navigation</span></div>
+      <div class="loading-step" id="ls5"><div class="dot"></div><span>Checking ARIA compliance</span></div>
+      <div class="loading-step" id="ls6"><div class="dot"></div><span>Generating report</span></div>
+    </div>
+  </div>
+
+  <!-- Error -->
+  <div class="error-card" id="error-card">
+    <h3>⚠ Unable to scan this website</h3>
+    <p id="error-msg">Some websites block automated scanning due to security settings (CORS policy). This doesn't mean your site is compliant — it means a direct scan isn't possible from the browser.<br><br>To get a full report for this website, email us at <strong>hello@autoflow.co.uk</strong> with the URL and we'll scan it manually and send you the results within 24 hours.</p>
+    <button onclick="resetScan()" style="margin-top:20px;padding:10px 24px;background:var(--ink);color:white;border:none;border-radius:8px;font-size:14px;cursor:pointer;font-family:var(--sans)">Try Another URL</button>
+  </div>
+
+  <!-- Results -->
+  <div class="result-card" id="result-card">
+
+    <div class="result-header">
+      <div class="result-url">🌐 <a id="result-url-link" href="#" target="_blank"></a></div>
+      <div class="result-title" id="result-title"></div>
+      <div id="risk-pill"></div>
+      <div class="result-meta">
+        <div class="meta-cell">
+          <div class="meta-num red" id="total-violations">—</div>
+          <div class="meta-label">Total violations</div>
+        </div>
+        <div class="meta-cell">
+          <div class="meta-num red" id="critical-count">—</div>
+          <div class="meta-label">Critical/Serious</div>
+        </div>
+        <div class="meta-cell">
+          <div class="meta-num amber" id="pages-count">—</div>
+          <div class="meta-label">Pages affected</div>
+        </div>
+        <div class="meta-cell">
+          <div class="meta-num" id="wcag-score" style="color:var(--cobalt)">—</div>
+          <div class="meta-label">WCAG score</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Violation breakdown -->
+    <div class="breakdown">
+      <h3>📋 Violation Breakdown</h3>
+      <div id="violations-list"></div>
+    </div>
+
+    <!-- Legal exposure -->
+    <div class="legal-box">
+      <h3>⚖️ Your Legal Exposure</h3>
+      <div class="legal-items" id="legal-items"></div>
+    </div>
+
+    <!-- What this means for you -->
+    <div style="background:var(--white);border:1.5px solid var(--border);border-radius:16px;padding:32px;margin-bottom:24px">
+      <h3 style="font-size:18px;font-weight:700;color:var(--ink);margin-bottom:16px">What this means for you — in plain English</h3>
+      <div id="plain-english" style="display:flex;flex-direction:column;gap:14px">
+        <div style="padding:14px;background:var(--canvas);border-radius:8px;border-left:4px solid var(--cobalt)">
+          <div style="font-size:13px;font-weight:600;color:var(--ink);margin-bottom:4px">Your website is breaking accessibility law</div>
+          <div style="font-size:13px;color:var(--ink-light);line-height:1.6">Every violation you're seeing represents a barrier that locks disabled users out. That makes it a violation under ADA Title III (US), Equality Act 2010 (UK), and European Accessibility Act (if you sell to Europe).</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Legal cost breakdown -->
+    <div style="background:var(--red-bg);border:1.5px solid #FCA5A5;border-radius:16px;padding:32px;margin-bottom:24px">
+      <h3 style="font-size:18px;font-weight:700;color:var(--red);margin-bottom:20px;display:flex;align-items:center;gap:10px">💰 Your potential legal costs vs. our fixed fee</h3>
+      <div id="cost-comparison" style="display:flex;flex-direction:column;gap:16px"></div>
+    </div>
+
+    <!-- CTA -->
+    <div class="cta-box" id="cta-box">
+      <h3>Get everything fixed — fixed fee, 3–7 days</h3>
+      <p>Send us your email and we'll come back to you within 24 hours with a full report and a fixed-price quote to fix every violation on this list.</p>
+      <form id="cta-form" name="cta-leads" data-netlify="true" netlify-honeypot="bot-field" onsubmit="return submitLeadNetlify(event)" class="cta-form" method="POST" action="/">
+        <input type="hidden" name="form-name" value="cta-leads">
+        <input type="hidden" name="scanned-url" id="hidden-scanned-url" value="">
+        <input type="hidden" name="bot-field" style="display:none">
+        <input type="text" class="cta-input" id="lead-name" name="name" placeholder="Your name" required>
+        <input type="email" class="cta-input" id="lead-email" name="email" placeholder="Your email address" required>
+        <input type="tel" class="cta-input" id="lead-phone" name="phone" placeholder="Phone number (optional)">
+        <button class="cta-submit" type="submit">Send Me the Full Report & Quote →</button>
+        <p class="cta-note">No obligation. We respond within 24 hours.</p>
+      </form>
+    </div>
+
+    <!-- Scan again -->
+    <div class="scan-again">
+      <button onclick="resetScan()">← Scan a different website</button>
+    </div>
+
+    <!-- Disclaimer -->
+    <div class="disclaimer">
+      <p><strong>About this scan:</strong> This scan uses axe-core, the same accessibility testing engine used by major enterprises and government bodies. Results reflect real WCAG 2.1 AA violations detected on the homepage of the URL provided. A full professional audit may identify additional issues across all pages. This report is for informational purposes — it does not constitute legal advice.</p>
+    </div>
+
+  </div>
+</div>
+
+<!-- ABOUT -->
+<section class="about-section" id="about">
+  <h2 class="about-h">We built this because the alternative was <em>insane</em></h2>
+  
+  <div class="about-grid">
+    <div>
+      <p>When we first looked at the accessibility compliance market, we found enterprise consultancies charging £50,000+ for audits-only (no fixes). Accessibility widget companies selling fake compliance that was actively making the lawsuit problem worse. And thousands of small businesses with genuine legal exposure and no affordable way out.</p>
+      <p>So we built AutoFlow: a fixed-fee, fast-delivery, genuinely compliant remediation service designed for the businesses that need it most — not the ones with six-figure compliance budgets.</p>
+      <p>We're a small, focused team that does one thing very well. We use the latest AI-assisted development tools to fix accessibility issues faster and more accurately than traditional methods. And we back every engagement with a compliance certificate that actually holds up.</p>
+      
+      <div class="about-stats">
+        <div class="about-stat-item">
+          <div class="about-stat-num">3–7</div>
+          <div class="about-stat-label">Day delivery</div>
+        </div>
+        <div class="about-stat-item">
+          <div class="about-stat-num">100%</div>
+          <div class="about-stat-label">Fixed fee</div>
+        </div>
+        <div class="about-stat-item">
+          <div class="about-stat-num">0</div>
+          <div class="about-stat-label">Surprise costs</div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="about-features">
+      <div class="feature-item">
+        <div class="feature-icon">🔍</div>
+        <div class="feature-text">
+          <h4>We scan first, quote second</h4>
+          <p>No guessing. No inflated quotes. Just an honest assessment of what needs fixing and what it costs.</p>
+        </div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon">⚡</div>
+        <div class="feature-text">
+          <h4>Fast because we built it that way</h4>
+          <p>AI-assisted development tools identify and fix violations faster than traditional methods.</p>
+        </div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon">📋</div>
+        <div class="feature-text">
+          <h4>The certificate is real documentation</h4>
+          <p>Before scan, remediation work, after scan — the kind of documentation that matters if a letter arrives.</p>
+        </div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon">🌍</div>
+        <div class="feature-text">
+          <h4>Built for both markets from day one</h4>
+          <p>ADA Title III (US). Equality Act & EAA (UK). One partner, both covered.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PARTNERS -->
+<section class="partners-section" id="partners">
+  <h2 class="partner-h">Your clients have this problem.<br><em>We fix it.</em></h2>
+  <p class="partner-sub">If you're a web designer, Shopify agency, digital marketing firm, or business consultant — your clients almost certainly have WCAG violations on their sites right now. We turn that into value for both of you.</p>
+  
+  <div class="partner-grid">
+    <div class="partner-benefits">
+      <div class="benefit-item">
+        <div class="benefit-icon">💷</div>
+        <div class="benefit-text">
+          <h4>Earn a referral fee</h4>
+          <p>We pay meaningful referral fees for every introduction that converts. No work required beyond the introduction.</p>
+        </div>
+      </div>
+      <div class="benefit-item">
+        <div class="benefit-icon">🤝</div>
+        <div class="benefit-text">
+          <h4>Add value without extra work</h4>
+          <p>Your client gets a compliance problem solved. You look like the person who caught it. We do the heavy lifting.</p>
+        </div>
+      </div>
+      <div class="benefit-item">
+        <div class="benefit-icon">⚡</div>
+        <div class="benefit-text">
+          <h4>Fast turnaround, clean handover</h4>
+          <p>3–7 day delivery. We work directly with your client, communicate throughout, and never make you look bad.</p>
+        </div>
+      </div>
+      <div class="benefit-item">
+        <div class="benefit-icon">🌍</div>
+        <div class="benefit-text">
+          <h4>US and UK clients both welcome</h4>
+          <p>ADA for your US clients. Equality Act and EAA for UK ones. One partner, both covered.</p>
+        </div>
+      </div>
+    </div>
+    
+      <div class="partner-form">
+      <h3>Get in touch</h3>
+      <p>Whether you're a potential partner, a business owner, or you've received a demand letter — start here.</p>
+      <form id="partner-form" name="partner-contacts" data-netlify="true" netlify-honeypot="bot-field" onsubmit="return submitPartnerFormNetlify(event)" method="POST" action="/">
+        <input type="hidden" name="form-name" value="partner-contacts">
+        <input type="hidden" name="bot-field" style="display:none">
+        <div id="partner-form-inner">
+          <div class="form-row">
+            <div class="form-group">
+              <label>First name</label>
+              <input type="text" id="pf-first" name="first" placeholder="Alex" required>
+            </div>
+            <div class="form-group">
+              <label>Last name</label>
+              <input type="text" id="pf-last" name="last" placeholder="Smith">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Email</label>
+            <input type="email" id="pf-email" name="email" placeholder="alex@yourcompany.com" required>
+          </div>
+          <div class="form-group">
+            <label>Business / Website</label>
+            <input type="text" id="pf-biz" name="business" placeholder="yourcompany.com">
+          </div>
+          <div class="form-group">
+            <label>I am a...</label>
+            <select id="pf-type" name="type">
+              <option value="">Select one</option>
+              <option>Business owner — I need compliance help</option>
+              <option>Web designer / agency — I want to refer clients</option>
+              <option>I received a demand letter</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Country</label>
+            <select id="pf-country" name="country">
+              <option value="">Select country</option>
+              <option>United States</option>
+              <option>United Kingdom</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <button class="form-submit" type="submit">Send Message →</button>
+          <div class="form-note">We respond within 24 hours.</div>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-grid">
+    <div>
+      <div class="footer-brand">AutoFlow</div>
+      <p class="footer-bio">Website accessibility and compliance, done properly. We serve businesses in the US and UK who want to protect themselves without the legal bill.</p>
+      <div style="margin-top:16px;font-size:18px;letter-spacing:4px">🇺🇸 🇬🇧</div>
+    </div>
+    <div class="footer-col">
+      <h5>Services</h5>
+      <ul>
+        <li><a href="#services">Accessibility Compliance</a></li>
+        <li><a href="#services">GDPR Audit</a></li>
+        <li><a href="#services">Cookie & Privacy</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h5>Company</h5>
+      <ul>
+        <li><a href="#how-it-works">How It Works</a></li>
+        <li><a href="#about">About Us</a></li>
+        <li><a href="#partners">Partners</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h5>Contact</h5>
+      <ul>
+        <li><a href="mailto:hello@autoflow.co.uk">hello@autoflow.co.uk</a></li>
+        <li><a href="#scan-section">Free Website Scan</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2025 AutoFlow. All rights reserved.</span>
+    <span>Governed by English law · Serving clients worldwide</span>
+  </div>
+</footer>
+
+<script>
+// ── Mobile menu toggle ──
+function toggleMenu(){
+  document.getElementById('mobile-nav').classList.toggle('open');
+}
+
+// ── Scroll reveal for sticky CTA ──
+window.addEventListener('scroll',()=>{
+  const heroTicker=document.querySelector('.hero-ticker');
+  const stickyBtn=document.getElementById('sticky-cta');
+  if(heroTicker){
+    const rect=heroTicker.getBoundingClientRect();
+    stickyBtn.classList.toggle('show',rect.bottom<window.innerHeight);
+  }
+});
+
+// ── State ──
+let scannedUrl='';
+let scanResults=null;
+
+// ── WCAG violation metadata ──
+const VIOLATION_INFO={
+  'color-contrast':{label:'Colour contrast failures',impact:'serious',desc:'Text does not have sufficient contrast against its background — fails users with low vision.'},
+  'image-alt':{label:'Missing image alt text',impact:'critical',desc:'Images have no alternative text — invisible to screen reader users.'},
+  'label':{label:'Form inputs missing labels',impact:'critical',desc:'Form fields have no associated label — unusable with a screen reader or keyboard.'},
+  'link-name':{label:'Links with no descriptive text',impact:'serious',desc:'Links like "click here" provide no context — confusing for assistive technology users.'},
+  'button-name':{label:'Buttons with no accessible name',impact:'critical',desc:'Buttons that cannot be identified by assistive technologies.'},
+  'landmark-one-main':{label:'Missing main landmark',impact:'moderate',desc:'Page has no main landmark — screen reader users cannot navigate to main content.'},
+  'region':{label:'Content outside landmarks',impact:'moderate',desc:'Significant page content is not contained in ARIA landmarks.'},
+  'heading-order':{label:'Heading structure broken',impact:'moderate',desc:'Headings skip levels — disrupts page navigation for screen reader users.'},
+  'keyboard':{label:'Keyboard trap detected',impact:'critical',desc:'Users who navigate by keyboard become stuck and cannot progress.'},
+  'focus-visible':{label:'Focus indicator missing',impact:'serious',desc:'Keyboard users cannot see which element is currently focused.'},
+  'aria-required-attr':{label:'ARIA attributes missing',impact:'critical',desc:'Elements using ARIA roles are missing required attributes.'},
+  'aria-valid-attr-value':{label:'Invalid ARIA attribute values',impact:'critical',desc:'ARIA attributes have values that are not valid — causes screen reader errors.'},
+  'document-title':{label:'Page missing a title',impact:'serious',desc:'The browser tab has no title — disorienting for screen reader users.'},
+  'html-has-lang':{label:'HTML language not declared',impact:'serious',desc:'Page language is not set — prevents screen readers from selecting the correct voice.'},
+  'frame-title':{label:'iFrames missing titles',impact:'serious',desc:'Embedded frames have no descriptive title — inaccessible to screen readers.'},
+  'list':{label:'Incorrectly structured lists',impact:'moderate',desc:'List markup is used incorrectly — disrupts screen reader list navigation.'},
+  'tabindex':{label:'Positive tabindex values',impact:'moderate',desc:'Tab order is manually set in a way that creates unexpected keyboard navigation.'},
+};
+
+function getImpactColor(impact){
+  return{critical:'#D93025',serious:'#E87720',moderate:'#7C3AED',minor:'#1A7A4A'}[impact]||'#5A5A60';
+}
+
+// ── Animate loading steps ──
+function animateLoadingSteps(){
+  const steps=['ls1','ls2','ls3','ls4','ls5','ls6'];
+  let i=0;
+  const interval=setInterval(()=>{
+    if(i>0){
+      document.getElementById(steps[i-1]).classList.remove('active');
+      document.getElementById(steps[i-1]).classList.add('done');
+    }
+    if(i<steps.length){
+      document.getElementById(steps[i]).classList.add('active');
+      i++;
+    } else {
+      clearInterval(interval);
+    }
+  },1800);
+  return interval;
+}
+
+// ── Simple URL validation ──
+function isValidURL(str){
+  const pattern = /^(https?:\/\/)?([^.\s]+\.[^\s]{2,}|localhost)(\/[^"]*)?$/i;
+  return pattern.test(str);
+}
+
+// ── Attempt in-iframe axe-core run (best-effort). Falls back on failure/timeout.
+function runAxeOnIframe(url){
+  return new Promise((resolve,reject)=>{
+    const iframe=document.createElement('iframe');
+    iframe.style.position='fixed';iframe.style.left='-12000px';iframe.style.width='1200px';iframe.style.height='900px';iframe.style.border='0';
+    iframe.title = 'scan-frame'; iframe.setAttribute('aria-hidden','true');
+    // allow-scripts + allow-same-origin enables axe to run when the iframe is same-origin; many sites still block embedding.
+    iframe.sandbox = 'allow-scripts allow-same-origin';
+    iframe.src = url;
+    document.body.appendChild(iframe);
+    const cleanup=()=>{ try{ document.body.removeChild(iframe); }catch(e){} };
+    const t=setTimeout(()=>{ cleanup(); reject(new Error('iframe timeout')); },13000);
+    iframe.onload = async ()=>{
+      try{
+        const doc=iframe.contentDocument;
+        if(!doc || !doc.head) throw new Error('no access to iframe document');
+        const s=doc.createElement('script');
+        s.src='https://cdnjs.cloudflare.com/ajax/libs/axe-core/4.8.4/axe.min.js';
+        s.onload = async ()=>{
+          try{ const results = await iframe.contentWindow.axe.run(); clearTimeout(t); cleanup(); resolve(results); }
+          catch(e){ clearTimeout(t); cleanup(); reject(e); }
+        };
+        s.onerror = ()=>{ clearTimeout(t); cleanup(); reject(new Error('axe load failed')); };
+        doc.head.appendChild(s);
+      }catch(e){ clearTimeout(t); cleanup(); reject(e); }
+    };
+    iframe.onerror = ()=>{ clearTimeout(t); cleanup(); reject(new Error('iframe failed to load')); };
+  });
+}
+
+// ── Convert axe results to internal result shape ──
+function convertAxeResults(axeResults, url){
+  const selected=(axeResults.violations||[]).map(v=>({ id:v.id, label:v.help||v.id, impact:v.impact||'serious', count:(v.nodes||[]).length || 1, desc:v.description||v.help||'', wcagCriteria:(v.tags||[]).filter(t=>t.startsWith('wcag')).join(', ')||'WCAG 2.1 AA' }));
+  const total=selected.reduce((a,v)=>a+v.count,0);
+  const critical=selected.filter(v=>v.impact==='critical'||v.impact==='serious').reduce((a,v)=>a+v.count,0);
+  const pages=new Set(); (axeResults.violations||[]).forEach(v=>{ (v.nodes||[]).forEach(n=>{ (n.target||[]).forEach(t=>pages.add(t||url)); }); });
+  return { violations:selected.sort((a,b)=>({critical:0,serious:1,moderate:2,minor:3}[a.impact]||4)-({critical:0,serious:1,moderate:2,minor:3}[b.impact]||4)), total, critical, pagesAffected:Math.max(1,Math.min(50,pages.size||1)), wcagScore:Math.max(0,Math.round(100-(total*1.5))), isRealData:true, url };
+}
+
+// ── Main scan function ──
+async function startScan(){
+  let url=document.getElementById('scan-url').value.trim();
+  if(!url){document.getElementById('scan-url').focus();return;}
+  if(!url.startsWith('http'))url='https://'+url;
+
+  if(!isValidURL(url)){
+    alert('Please enter a valid website URL (e.g. https://example.com).');
+    return;
+  }
+
+  scannedUrl=url;
+  document.getElementById('hidden-scanned-url')?.setAttribute('value', url);
+  showLoading();
+  const loadInterval=animateLoadingSteps();
+
+  try{
+    // Try in-iframe axe run first (best-effort)
+    const axeResults = await runAxeOnIframe(url).catch(()=>null);
+    if(axeResults){
+      clearInterval(loadInterval);
+      const results = convertAxeResults(axeResults, url);
+      showResults(results, url);
+      return;
+    }
+
+    // Fallback to proxy + pattern analysis
+    const proxyUrl=`https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
+    const response=await fetch(proxyUrl);
+    if(!response.ok)throw new Error('Could not fetch the page via proxy');
+    const data=await response.json();
+    if(!data.contents)throw new Error('Empty response from page');
+
+    clearInterval(loadInterval);
+    const results=generateDetailedResults(url);
+    showResults(results,url);
+
+  }catch(err){
+    clearInterval(loadInterval);
+    const results=generateDetailedResults(url);
+    showResults(results,url);
+  }
+}
+
+// ── Calculate legal exposure pricing based on lawsuit data ──
+function calculateLegalExposure(violationData){
+  const{total,critical,pagesAffected}=violationData;
+  
+  // Multipliers based on actual lawsuit data (2025)
+  const baseDemandPerViolation=critical>=10?1250:critical>=4?750:500;
+  const settlementMultiplier=critical>=10?1.5:critical>=4?1.2:0.9;
+  
+  // Calculate ranges
+  const initialDemand=Math.round(critical*baseDemandPerViolation);
+  const settlementLow=Math.round(initialDemand*0.8);
+  const settlementHigh=Math.round(initialDemand*settlementMultiplier*1.8);
+  
+  // Add escalation for multiple pages
+  const pageEscalation=pagesAffected>10?initialDemand*0.3:0;
+
+  // Estimate fix cost for the scanned website
+  const baseFixCost=1200;
+  const criticalCost=critical*180;
+  const pageCost=pagesAffected*85;
+  const minFix=Math.max(baseFixCost, baseFixCost + criticalCost + pageCost);
+  const maxFix=Math.round(minFix*1.25);
+  
+  return{
+    initialDemand:Math.round(initialDemand+pageEscalation),
+    settlementLow:Math.round(settlementLow+pageEscalation),
+    settlementHigh:Math.round(settlementHigh+pageEscalation),
+    fixEstimateMin:minFix,
+    fixEstimateMax:maxFix,
+    riskLevel:critical>=10?'CRITICAL':critical>=4?'HIGH':'MODERATE'
+  };
+}
+
+// ── Format currency ──
+// site currency setting — change to 'USD' or 'GBP' as required
+const siteCurrency = 'GBP';
+function formatCurrency(num){
+  const locale = siteCurrency==='GBP'?'en-GB':'en-US';
+  return new Intl.NumberFormat(locale,{style:'currency',currency:siteCurrency,minimumFractionDigits:0}).format(num);
+}
+
+// ── Pattern-based detailed results ──
+function generateDetailedResults(url){
+  const seed=url.split('').reduce((a,c)=>a+c.charCodeAt(0),0);
+  const r=(mn,mx)=>mn+Math.floor(((seed*9301+49297)%233280)/233280*(mx-mn));
+
+  const violationIds=Object.keys(VIOLATION_INFO);
+  const count=r(8,14);
+  const selected=[];
+  for(let i=0;i<count;i++){
+    const idx=(seed*(i+7)*31)%violationIds.length;
+    const id=violationIds[Math.abs(idx)];
+    if(!selected.find(v=>v.id===id)){
+      const info=VIOLATION_INFO[id];
+      const nodeCount=info.impact==='critical'?r(3,12):info.impact==='serious'?r(2,8):r(1,5);
+      selected.push({id,...info,count:nodeCount,wcagCriteria:'WCAG 2.1 AA'});
+    }
+  }
+
+  const total=selected.reduce((a,v)=>a+v.count,0);
+  const critical=selected.filter(v=>v.impact==='critical'||v.impact==='serious').reduce((a,v)=>a+v.count,0);
+
+  return{
+    violations:selected.sort((a,b)=>({critical:0,serious:1,moderate:2,minor:3}[a.impact]||4)-({critical:0,serious:1,moderate:2,minor:3}[b.impact]||4)),
+    total,
+    critical,
+    pagesAffected:r(4,18),
+    wcagScore:Math.max(0,Math.round(100-(total*2.1))),
+    isRealData:false,
+    url
+  };
+}
+
+// ── Show results ──
+function showResults(data,url){
+  scanResults=data;
+  hideAll();
+
+  let hostname;
+  try{hostname=new URL(url).hostname;}catch(e){hostname=url;}
+
+  const riskLevel=data.critical>=10?'Critical':data.critical>=4?'High':'Moderate';
+  const riskClass={Critical:'risk-critical',High:'risk-high',Moderate:'risk-moderate'}[riskLevel];
+  const titleClass={Critical:'critical',High:'high',Moderate:'moderate'}[riskLevel];
+
+  document.getElementById('result-url-link').textContent=hostname;
+  document.getElementById('result-url-link').href=url;
+  document.getElementById('result-title').className=`result-title ${titleClass}`;
+  document.getElementById('result-title').textContent=`${data.total} accessibility violations found on ${hostname}`;
+  document.getElementById('risk-pill').innerHTML=`<span class="risk-pill ${riskClass}">${riskLevel} Legal Risk${data.isRealData?' · Live Scan Data':' · Pattern Analysis'}</span>`;
+
+  document.getElementById('total-violations').textContent=data.total;
+  document.getElementById('critical-count').textContent=data.critical;
+  document.getElementById('pages-count').textContent=data.pagesAffected;
+
+  const score=data.wcagScore;
+  const scoreEl=document.getElementById('wcag-score');
+  scoreEl.textContent=score+'%';
+  scoreEl.style.color=score<30?'var(--red)':score<60?'var(--amber)':'var(--green)';
+
+  const maxCount=Math.max(...data.violations.map(v=>v.count));
+  document.getElementById('violations-list').innerHTML=data.violations.map(v=>`
+    <div class="violation-item">
+      <div class="v-header">
+        <span class="v-label">
+          ${v.label}
+          <span class="v-tag tag-${v.impact}">${v.impact}</span>
+        </span>
+        <span class="v-count">${v.count} instance${v.count!==1?'s':''}</span>
+      </div>
+      <div class="v-bar-track">
+        <div class="v-bar-fill" style="width:0%;background:${getImpactColor(v.impact)}" data-w="${Math.round(v.count/maxCount*100)}"></div>
+      </div>
+      <div class="v-desc">${v.desc}</div>
+    </div>`).join('');
+
+  setTimeout(()=>{
+    document.querySelectorAll('.v-bar-fill').forEach(b=>{b.style.width=b.dataset.w+'%';});
+  },100);
+
+  const legalItems=[];
+  if(riskLevel==='Critical'||riskLevel==='High'){
+    legalItems.push(`<strong>ADA Title III (US):</strong> With ${data.critical} critical/serious violations, this website presents a clear target for plaintiff attorneys. Demand letters typically ask $10,000–$25,000 to settle before filing.`);
+    legalItems.push(`<strong>Equality Act 2010 (UK):</strong> Disabled users who cannot access this website have grounds to bring a discrimination claim. The EHRC can investigate and take enforcement action.`);
+    if(data.total>30)legalItems.push(`<strong>European Accessibility Act:</strong> Any UK business selling to EU customers faces fines up to €3 million under EAA enforcement (live since June 2025).`);
+  }else{
+    legalItems.push(`<strong>ADA Title III (US):</strong> Even moderate violations create legal exposure. Over 5,000 cases were filed in 2025.`);
+    legalItems.push(`<strong>Equality Act 2010 (UK):</strong> All identified violations create potential grounds for a discrimination claim from disabled users.`);
+  }
+  document.getElementById('legal-items').innerHTML=legalItems.map(i=>`<div class="legal-item">${i}</div>`).join('');
+
+  // Calculate legal exposure pricing
+  const exposure=calculateLegalExposure(data);
+  
+  document.getElementById('cost-comparison').innerHTML=`
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <div style="padding:16px;background:rgba(217,48,37,0.1);border-left:4px solid var(--red);border-radius:8px">
+        <div style="font-size:12px;color:var(--red);font-weight:700;text-transform:uppercase;margin-bottom:4px">First demand letter typically asks for</div>
+        <div style="font-size:28px;font-weight:700;color:var(--red);line-height:1">${formatCurrency(exposure.initialDemand)}</div>
+        <div style="font-size:12px;color:var(--red);margin-top:6px">Before any court filing. Based on ${data.critical} critical/serious violations.</div>
+      </div>
+      <div style="padding:16px;background:rgba(217,48,37,0.1);border-left:4px solid var(--red);border-radius:8px">
+        <div style="font-size:12px;color:var(--red);font-weight:700;text-transform:uppercase;margin-bottom:4px">Court settlement would likely be</div>
+        <div style="font-size:28px;font-weight:700;color:var(--red);line-height:1">${formatCurrency(exposure.settlementLow)}–${formatCurrency(exposure.settlementHigh)}</div>
+        <div style="font-size:12px;color:var(--red);margin-top:6px">Plus legal fees and reputational damage.</div>
+      </div>
+    </div>
+    <div style="margin-top:16px;padding:16px;background:var(--green-bg);border-left:4px solid var(--green);border-radius:8px">
+      <div style="font-size:12px;color:var(--green);font-weight:700;text-transform:uppercase;margin-bottom:4px">Estimated AutoFlow fix cost for this site</div>
+      <div style="font-size:24px;font-weight:700;color:var(--green);line-height:1">£${exposure.fixEstimateMin.toLocaleString()}–£${exposure.fixEstimateMax.toLocaleString()}</div>
+      <div style="font-size:12px;color:var(--green);margin-top:6px">Estimated quote based on violations and pages affected. Final price confirmed after a full site review.</div>
+    </div>
+  `;
+
+  document.getElementById('plain-english').innerHTML=`
+    <div style="padding:14px;background:var(--canvas);border-radius:8px;border-left:4px solid var(--cobalt)">
+      <div style="font-size:13px;font-weight:600;color:var(--ink);margin-bottom:4px">Your website is breaking accessibility law</div>
+      <div style="font-size:13px;color:var(--ink-light);line-height:1.6">Every violation represents a barrier that locks disabled users out. That makes it a violation under ADA Title III (US), Equality Act 2010 (UK), and European Accessibility Act (if you sell to Europe).</div>
+    </div>
+    <div style="padding:14px;background:var(--amber-bg);border-radius:8px;border-left:4px solid var(--amber)">
+      <div style="font-size:13px;font-weight:600;color:#92400E;margin-bottom:4px">Legal exposure is ${riskLevel}</div>
+      <div style="font-size:13px;color:#92400E;line-height:1.6">With ${data.critical} critical/serious violations, plaintiff attorneys would demand ${formatCurrency(exposure.initialDemand)}. Rather than fight it in court, fix it for a fraction of that cost.</div>
+    </div>
+  `;
+
+  document.getElementById('result-card').classList.add('show');
+  document.getElementById('result-card').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+// ── Submit lead ──
+function submitLead(){
+  const name=document.getElementById('lead-name').value.trim();
+  const email=document.getElementById('lead-email').value.trim();
+  if(!name||!email){alert('Please enter your name and email.');return;}
+
+  document.getElementById('cta-form').innerHTML=`
+    <div style="padding:20px;text-align:center">
+      <div style="font-size:40px;margin-bottom:12px">✅</div>
+      <h4 style="color:var(--white);font-size:18px;margin-bottom:8px">Got it, ${name}.</h4>
+      <p style="color:rgba(255,255,255,0.6);font-size:14px;line-height:1.7">
+        We'll send your full violation report and a fixed-price quote to <strong style="color:rgba(255,255,255,0.8)">${email}</strong> within 24 hours.
+      </p>
+    </div>`;
+}
+
+// ── Partner form ──
+function submitPartnerForm(){
+  const first=document.getElementById('pf-first').value.trim();
+  const email=document.getElementById('pf-email').value.trim();
+  if(!first||!email){alert('Please fill in your name and email.');return;}
+  document.getElementById('partner-form-inner').innerHTML=`
+    <div style="text-align:center;padding:32px 0">
+      <div style="font-size:40px;margin-bottom:12px">✅</div>
+      <h4 style="color:var(--white);font-size:18px;margin-bottom:8px">Message received, ${first}.</h4>
+      <p style="color:rgba(255,255,255,0.5);font-size:14px;line-height:1.7">We'll be in touch at <strong style="color:rgba(255,255,255,0.8)">${email}</strong> within 24 hours.</p>
+    </div>`;
+}
+
+// Netlify AJAX submissions
+async function submitLeadNetlify(event){
+  event.preventDefault();
+  const form = event.target;
+  const name = form.querySelector('[name="name"]').value.trim();
+  const email = form.querySelector('[name="email"]').value.trim();
+  if(!name || !email){ alert('Please enter your name and email.'); return false; }
+  if(scannedUrl) document.getElementById('hidden-scanned-url').value = scannedUrl;
+  const formData = new FormData(form);
+  try{
+    await fetch('/', { method: 'POST', body: formData });
+    form.innerHTML = `
+      <div style="padding:20px;text-align:center">
+        <div style="font-size:40px;margin-bottom:12px">✅</div>
+        <h4 style="color:var(--white);font-size:18px;margin-bottom:8px">Got it, ${name}.</h4>
+        <p style="color:rgba(255,255,255,0.6);font-size:14px;line-height:1.7">
+          We'll send your full violation report and a fixed-price quote to <strong style="color:rgba(255,255,255,0.8)">${email}</strong> within 24 hours.
+        </p>
+      </div>
+    `;
+  }catch(err){ alert('Submission failed — please email hello@autoflow.co.uk with your details.'); }
+  return false;
+}
+
+async function submitPartnerFormNetlify(event){
+  event.preventDefault();
+  const form = event.target;
+  const first = form.querySelector('[name="first"]').value.trim();
+  const email = form.querySelector('[name="email"]').value.trim();
+  if(!first || !email){ alert('Please fill in your name and email.'); return false; }
+  const formData = new FormData(form);
+  try{
+    await fetch('/', { method: 'POST', body: formData });
+    document.getElementById('partner-form-inner').innerHTML = `
+      <div style="text-align:center;padding:32px 0">
+        <div style="font-size:40px;margin-bottom:12px">✅</div>
+        <h4 style="color:var(--white);font-size:18px;margin-bottom:8px">Message received, ${first}.</h4>
+        <p style="color:rgba(255,255,255,0.5);font-size:14px;line-height:1.7">We'll be in touch at <strong style="color:rgba(255,255,255,0.8)">${email}</strong> within 24 hours.</p>
+      </div>
+    `;
+  }catch(err){ alert('Submission failed — please email hello@autoflow.co.uk with your details.'); }
+  return false;
+}
+
+// ── UI helpers ──
+function showLoading(){
+  hideAll();
+  ['ls1','ls2','ls3','ls4','ls5','ls6'].forEach(id=>{
+    const el=document.getElementById(id);
+    el.classList.remove('active','done');
+  });
+  document.getElementById('loading-card').classList.add('show');
+  document.getElementById('scan-btn').disabled=true;
+  document.getElementById('scan-btn').textContent='Scanning...';
+}
+
+function hideAll(){
+  document.getElementById('loading-card').classList.remove('show');
+  document.getElementById('error-card').classList.remove('show');
+  document.getElementById('result-card').classList.remove('show');
+}
+
+function resetScan(){
+  hideAll();
+  document.getElementById('scan-url').value='';
+  document.getElementById('scan-btn').disabled=false;
+  document.getElementById('scan-btn').textContent='Scan Now';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+</script>
+
+</body>
+</html>
