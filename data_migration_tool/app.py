@@ -1,0 +1,195 @@
+"""Streamlit front end for the AutoFlow data migration tool.
+
+Run with: ``streamlit run data_migration_tool/app.py``
+"""
+
+from __future__ import annotations
+
+import sys
+import traceback
+from pathlib import Path
+
+import pandas as pd
+import streamlit as st
+from streamlit.runtime.uploaded_file_manager import UploadedFile
+
+if __package__ in (None, ""):  # allow `streamlit run data_migration_tool/app.py`
+    sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
+from data_migration_tool.auditors import audit_import
+from data_migration_tool.branding import Branding
+from data_migration_tool.cleaners import CleaningConfig
+from data_migration_tool.io_utils import (
+    MAX_UPLOAD_MB,
+    SourceFileError,
+    exceeds_size_limit,
+    read_source,
+)
+from data_migration_tool.mappers import available_crms, load_mapping_config
+from data_migration_tool.pipeline import run_pipeline
+from data_migration_tool.reporters import render_audit_report
+
+BRANDING = Branding.load()
+UNEXPECTED_ERROR = (
+    "Something went wrong while processing this file. It may not be a standard CSV "
+    "export — please check that it opens as a table in Excel and try again."
+)
+
+st.set_page_config(
+    page_title=f"{BRANDING.brand_name} Data Migration Tool", page_icon="🚀", layout="wide"
+)
+
+
+def read_upload(upload: UploadedFile) -> pd.DataFrame:
+    """Read an upload of unknown encoding, refusing files above the size limit."""
+    if exceeds_size_limit(upload.size):
+        raise SourceFileError(
+            f"{upload.name} is larger than {MAX_UPLOAD_MB} MB. "
+            "Split it into smaller files, or run the command line tool instead."
+        )
+    return read_source(upload, upload.name)
+
+
+st.title("🚀 Data Migration Tool")
+st.caption("Clean, map and validate a CRM export, then download import-ready deliverables.")
+
+with st.sidebar:
+    st.header("Cleaning options")
+    remove_duplicates = st.checkbox("Remove duplicate records", value=True)
+    standardize_dates = st.checkbox("Standardise dates to YYYY-MM-DD", value=True)
+    standardize_phones = st.checkbox("Standardise phones to E.164", value=True)
+    fix_scientific = st.checkbox("Repair Excel scientific notation", value=True)
+    normalize_unicode = st.checkbox("Fold accents to ASCII", value=False)
+    missing_strategy = st.selectbox(
+        "Missing values", ["flag", "auto", "drop"], help="auto fills median/mode"
+    )
+    region = st.text_input("Default phone region", value="US", max_chars=2)
+    date_order = st.selectbox(
+        "Date order for ambiguous dates",
+        ["Guess per value", "Day first (04/03 = 4 March)", "Month first (04/03 = 3 April)"],
+        help="Ask the client which convention their export uses; guessing is only safe "
+        "when every ambiguous date has a day above 12.",
+    )
+    st.caption(f"Uploads are limited to {MAX_UPLOAD_MB} MB.")
+
+st.subheader("Step 1 — Upload your messy CSV")
+uploaded = st.file_uploader("CSV export from the source CRM", type=["csv"])
+
+st.subheader("Step 2 — Select your target CRM")
+crm = st.selectbox("Target CRM", available_crms(), format_func=str.title)
+
+st.subheader("Step 3 — Configure output")
+project_name = st.text_input("Project name", value="Client migration")
+include_qa = st.checkbox("Include QA report", value=True)
+include_mapping_log = st.checkbox("Include mapping log", value=True)
+include_audit = st.checkbox("Include post-import audit (requires a CRM export)", value=False)
+audit_upload = None
+audit_key = None
+if include_audit:
+    audit_upload = st.file_uploader("CRM export to audit against", type=["csv"], key="audit")
+    audit_key = st.text_input("Unique key column (must exist in both files)", value="email")
+
+with st.expander("Preview the target template"):
+    config = load_mapping_config(crm)
+    st.write(
+        pd.DataFrame(
+            [
+                {"field": f.name, "required": f.required, "unique": f.unique,
+                 "transform": f.transform or ""}
+                for f in config.fields
+            ]
+        )
+    )
+
+if st.button("🔄 Process File", type="primary", disabled=uploaded is None) and uploaded:
+    dayfirst = {"Guess per value": None}.get(date_order, date_order.startswith("Day first"))
+    try:
+        with st.spinner("Cleaning, mapping and validating…"):
+            source = read_upload(uploaded)
+            result = run_pipeline(
+                source=source,
+                crm=crm,
+                cleaning_config=CleaningConfig(
+                    remove_duplicates=remove_duplicates,
+                    standardize_dates=standardize_dates,
+                    standardize_phones=standardize_phones,
+                    fix_scientific_notation=fix_scientific,
+                    normalize_unicode=normalize_unicode,
+                    missing_value_strategy=missing_strategy,
+                    default_region=region.upper() or "US",
+                    date_dayfirst=dayfirst,
+                ),
+                project_name=project_name,
+                source_filename=uploaded.name,
+                branding=BRANDING,
+            )
+    except SourceFileError as error:
+        st.error(str(error))
+        st.stop()
+    except Exception:  # noqa: BLE001 - never show a traceback to a client
+        st.error(UNEXPECTED_ERROR)
+        traceback.print_exc()
+        st.stop()
+
+    summary = result.summary()
+    st.success(
+        f"Done — {summary['rows_in']} rows in, {summary['rows_out']} out, "
+        f"quality score {summary['quality_score']}%."
+    )
+    columns = st.columns(5)
+    columns[0].metric("Quality score", f"{summary['quality_score']}%")
+    columns[1].metric("Records", summary["rows_out"])
+    columns[2].metric("Duplicates removed", summary["duplicates_removed"])
+    columns[3].metric("Errors", summary["errors"])
+    columns[4].metric("Warnings", summary["warnings"])
+
+    st.subheader("Step 4 — Download results")
+    downloads = st.columns(3)
+    downloads[0].download_button(
+        "📊 Clean CSV",
+        result.clean_frame.to_csv(index=False),
+        file_name="clean_data.csv",
+        mime="text/csv",
+    )
+    if include_qa:
+        downloads[1].download_button(
+            "📋 QA report (HTML)",
+            result.qa_report_html,
+            file_name="qa_report.html",
+            mime="text/html",
+        )
+    if include_mapping_log:
+        downloads[2].download_button(
+            "📝 Mapping log",
+            result.mapping_log().to_csv(index=False),
+            file_name="mapping_log.csv",
+            mime="text/csv",
+        )
+
+    tabs = st.tabs(["Mapped data", "Field mapping", "Cleaning actions", "Issues", "QA report"])
+    tabs[0].dataframe(result.clean_frame.head(200), use_container_width=True)
+    tabs[1].dataframe(result.mapping_log(), use_container_width=True)
+    tabs[2].dataframe(result.cleaning_log(), use_container_width=True)
+    tabs[3].dataframe(result.validation.issues_frame(), use_container_width=True)
+    with tabs[4]:
+        st.components.v1.html(result.qa_report_html, height=700, scrolling=True)
+
+    if include_audit and audit_upload is not None and audit_key:
+        try:
+            audit = audit_import(
+                expected=result.clean_frame, exported=read_upload(audit_upload), key=audit_key
+            )
+        except (SourceFileError, KeyError) as error:
+            st.error(f"Post-import audit skipped: {error}")
+        else:
+            st.subheader("Post-import audit")
+            st.json(audit.stats())
+            st.dataframe(audit.mismatches, use_container_width=True)
+            st.download_button(
+                "🧾 Audit report (HTML)",
+                render_audit_report(audit.stats(), audit.mismatches, project_name, BRANDING),
+                file_name="audit_report.html",
+                mime="text/html",
+            )
+elif uploaded is None:
+    st.info("Upload a CSV to enable processing.")

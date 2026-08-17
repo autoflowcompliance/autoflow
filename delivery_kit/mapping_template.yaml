@@ -1,0 +1,51 @@
+# Mapping template — copy this file to configs/<your_crm>.yaml and edit it.
+# Then select it in the app, or run:  --crm configs/<your_crm>.yaml
+#
+# Each entry under `fields` is one column in the target CRM import file, in the
+# order the CRM expects. Source columns are matched by name, then by the
+# aliases below, then by fuzzy similarity, so you only need aliases for names
+# that do not look like the target field.
+
+crm: Your CRM            # shown in the QA report
+description: Import template for Your CRM contacts
+
+fields:
+  - name: first_name     # exact column header the CRM expects
+    type: string         # string | email | phone | date | number
+    required: true       # empty values become errors in the QA report
+    aliases: ["First Name", "Given Name", "fname"]
+
+  - name: last_name
+    type: string
+    required: true
+    aliases: ["Last Name", "Surname", "lname"]
+
+  - name: email
+    type: email
+    required: true
+    unique: true         # duplicates become errors in the QA report
+    transform: email_lowercase
+    aliases: ["Email Address", "E-mail", "Primary Email"]
+
+  - name: phone
+    type: phone
+    transform: phone_e164
+    aliases: ["Phone 1", "Telephone", "Mobile"]
+
+  - name: full_name      # combine several source columns into one field
+    type: string
+    sources: ["First Name", "Last Name"]
+    separator: " "
+
+  - name: created_at
+    type: date
+    transform: date_iso
+    aliases: ["Created Date", "Date Added"]
+
+  - name: source
+    type: string
+    default: "CSV import"   # used when no source column matches
+
+# Available transforms:
+#   phone_e164, email_lowercase, date_iso, trim, title_case, upper_case,
+#   lower_case, digits_only, ascii, expand_scientific_notation
