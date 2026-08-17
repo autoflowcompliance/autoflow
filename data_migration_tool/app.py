@@ -6,6 +6,7 @@ Run with: ``streamlit run data_migration_tool/app.py``
 from __future__ import annotations
 
 import sys
+import traceback
 from pathlib import Path
 
 import pandas as pd
@@ -16,16 +17,37 @@ if __package__ in (None, ""):  # allow `streamlit run data_migration_tool/app.py
     sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from data_migration_tool.auditors import audit_import
+from data_migration_tool.branding import Branding
 from data_migration_tool.cleaners import CleaningConfig
+from data_migration_tool.io_utils import (
+    MAX_UPLOAD_MB,
+    SourceFileError,
+    exceeds_size_limit,
+    read_source,
+)
 from data_migration_tool.mappers import available_crms, load_mapping_config
 from data_migration_tool.pipeline import run_pipeline
 from data_migration_tool.reporters import render_audit_report
 
-st.set_page_config(page_title="AutoFlow Data Migration Tool", page_icon="🚀", layout="wide")
+BRANDING = Branding.load()
+UNEXPECTED_ERROR = (
+    "Something went wrong while processing this file. It may not be a standard CSV "
+    "export — please check that it opens as a table in Excel and try again."
+)
+
+st.set_page_config(
+    page_title=f"{BRANDING.brand_name} Data Migration Tool", page_icon="🚀", layout="wide"
+)
 
 
 def read_upload(upload: UploadedFile) -> pd.DataFrame:
-    return pd.read_csv(upload, dtype=str, keep_default_na=False)
+    """Read an upload of unknown encoding, refusing files above the size limit."""
+    if exceeds_size_limit(upload.size):
+        raise SourceFileError(
+            f"{upload.name} is larger than {MAX_UPLOAD_MB} MB. "
+            "Split it into smaller files, or run the command line tool instead."
+        )
+    return read_source(upload, upload.name)
 
 
 st.title("🚀 Data Migration Tool")
@@ -42,6 +64,13 @@ with st.sidebar:
         "Missing values", ["flag", "auto", "drop"], help="auto fills median/mode"
     )
     region = st.text_input("Default phone region", value="US", max_chars=2)
+    date_order = st.selectbox(
+        "Date order for ambiguous dates",
+        ["Guess per value", "Day first (04/03 = 4 March)", "Month first (04/03 = 3 April)"],
+        help="Ask the client which convention their export uses; guessing is only safe "
+        "when every ambiguous date has a day above 12.",
+    )
+    st.caption(f"Uploads are limited to {MAX_UPLOAD_MB} MB.")
 
 st.subheader("Step 1 — Upload your messy CSV")
 uploaded = st.file_uploader("CSV export from the source CRM", type=["csv"])
@@ -73,23 +102,34 @@ with st.expander("Preview the target template"):
     )
 
 if st.button("🔄 Process File", type="primary", disabled=uploaded is None) and uploaded:
-    with st.spinner("Cleaning, mapping and validating…"):
-        source = read_upload(uploaded)
-        result = run_pipeline(
-            source=source,
-            crm=crm,
-            cleaning_config=CleaningConfig(
-                remove_duplicates=remove_duplicates,
-                standardize_dates=standardize_dates,
-                standardize_phones=standardize_phones,
-                fix_scientific_notation=fix_scientific,
-                normalize_unicode=normalize_unicode,
-                missing_value_strategy=missing_strategy,
-                default_region=region.upper() or "US",
-            ),
-            project_name=project_name,
-            source_filename=getattr(uploaded, "name", "upload.csv"),
-        )
+    dayfirst = {"Guess per value": None}.get(date_order, date_order.startswith("Day first"))
+    try:
+        with st.spinner("Cleaning, mapping and validating…"):
+            source = read_upload(uploaded)
+            result = run_pipeline(
+                source=source,
+                crm=crm,
+                cleaning_config=CleaningConfig(
+                    remove_duplicates=remove_duplicates,
+                    standardize_dates=standardize_dates,
+                    standardize_phones=standardize_phones,
+                    fix_scientific_notation=fix_scientific,
+                    normalize_unicode=normalize_unicode,
+                    missing_value_strategy=missing_strategy,
+                    default_region=region.upper() or "US",
+                    date_dayfirst=dayfirst,
+                ),
+                project_name=project_name,
+                source_filename=uploaded.name,
+                branding=BRANDING,
+            )
+    except SourceFileError as error:
+        st.error(str(error))
+        st.stop()
+    except Exception:  # noqa: BLE001 - never show a traceback to a client
+        st.error(UNEXPECTED_ERROR)
+        traceback.print_exc()
+        st.stop()
 
     summary = result.summary()
     st.success(
@@ -135,17 +175,21 @@ if st.button("🔄 Process File", type="primary", disabled=uploaded is None) and
         st.components.v1.html(result.qa_report_html, height=700, scrolling=True)
 
     if include_audit and audit_upload is not None and audit_key:
-        audit = audit_import(
-            expected=result.clean_frame, exported=read_upload(audit_upload), key=audit_key
-        )
-        st.subheader("Post-import audit")
-        st.json(audit.stats())
-        st.dataframe(audit.mismatches, use_container_width=True)
-        st.download_button(
-            "🧾 Audit report (HTML)",
-            render_audit_report(audit.stats(), audit.mismatches, project_name),
-            file_name="audit_report.html",
-            mime="text/html",
-        )
+        try:
+            audit = audit_import(
+                expected=result.clean_frame, exported=read_upload(audit_upload), key=audit_key
+            )
+        except (SourceFileError, KeyError) as error:
+            st.error(f"Post-import audit skipped: {error}")
+        else:
+            st.subheader("Post-import audit")
+            st.json(audit.stats())
+            st.dataframe(audit.mismatches, use_container_width=True)
+            st.download_button(
+                "🧾 Audit report (HTML)",
+                render_audit_report(audit.stats(), audit.mismatches, project_name, BRANDING),
+                file_name="audit_report.html",
+                mime="text/html",
+            )
 elif uploaded is None:
     st.info("Upload a CSV to enable processing.")

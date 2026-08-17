@@ -1,3 +1,6 @@
+import pandas as pd
+
+from data_migration_tool.cleaners import CleaningConfig, clean_data
 from data_migration_tool.transforms import (
     expand_scientific_notation,
     is_valid_email,
@@ -27,6 +30,19 @@ def test_dates_normalize_to_iso():
     assert to_iso_date("2024-12-31") == "2024-12-31"
     assert to_iso_date("31-Dec-24") == "2024-12-31"
     assert to_iso_date("31/12/2024") == "2024-12-31"
+
+
+def test_ambiguous_dates_follow_explicit_order():
+    assert to_iso_date("04/03/2026", dayfirst=True) == "2026-03-04"
+    assert to_iso_date("04/03/2026", dayfirst=False) == "2026-04-03"
+
+
+def test_cleaner_honours_configured_date_order():
+    frame = pd.DataFrame({"Created Date": ["04/03/2026"]})
+    dayfirst = clean_data(frame, CleaningConfig(date_dayfirst=True)).frame
+    monthfirst = clean_data(frame, CleaningConfig(date_dayfirst=False)).frame
+    assert dayfirst.loc[0, "Created Date"] == "2026-03-04"
+    assert monthfirst.loc[0, "Created Date"] == "2026-04-03"
 
 
 def test_scientific_notation_expands():

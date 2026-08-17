@@ -1,0 +1,7 @@
+# White-label the generated QA and audit reports.
+# Environment variables BRAND_NAME, LOGO_URL, BRAND_FOOTER_NOTE and
+# BRAND_ACCENT_COLOUR override these values at runtime.
+brand_name: AutoFlow
+logo_url: ""
+footer_note: ""
+accent_colour: "#111827"

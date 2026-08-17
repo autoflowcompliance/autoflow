@@ -144,7 +144,7 @@ def clean_data(
             _apply(
                 result,
                 column,
-                lambda v: to_iso_date(v, config.date_format),
+                lambda v: to_iso_date(v, config.date_format, config.date_dayfirst),
                 "standardized_date",
                 config.date_format,
             )

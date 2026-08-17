@@ -26,6 +26,35 @@ python -m data_migration_tool.cli \
 
 The CLI exits with status `1` when the validator found errors, so it can gate a delivery script.
 
+## Reading client files
+
+Encoding is detected per file (`charset-normalizer`), so Windows-1252 exports with
+`Müller` or `Café` load without a `UnicodeDecodeError`; the delimiter is sniffed too.
+Unreadable files raise a client-safe message instead of a traceback. Streamlit uploads
+are capped at 200 MB in `.streamlit/config.toml` — larger files go through the CLI.
+
+Ambiguous dates such as `04/03/2026` are **not** guessed when you say otherwise: set
+`--date-order dayfirst|monthfirst` on the CLI, `date_dayfirst` in the cleaning config,
+or the sidebar selector in the app. The default (`auto`) only infers day-first when the
+first component cannot be a month.
+
+## White-labelling
+
+Edit `branding.yaml`, or set `BRAND_NAME`, `LOGO_URL`, `BRAND_FOOTER_NOTE` and
+`BRAND_ACCENT_COLOUR`, which override the file. Both the QA report and the audit report
+pick the values up.
+
+## Other CRMs
+
+Zoho, Keap, Monday.com and anything else need one YAML file, no code: see
+[docs/CUSTOM_CRM_MAPPING.md](docs/CUSTOM_CRM_MAPPING.md) and
+[../delivery_kit/mapping_template.yaml](../delivery_kit/mapping_template.yaml).
+
+## Client delivery
+
+`../delivery_kit/` holds the client-facing README and mapping template;
+`../delivery_kit/build_kit.sh` zips the tool plus those files for handover.
+
 ## Deliverables
 
 | File | Contents |

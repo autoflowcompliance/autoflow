@@ -9,6 +9,7 @@ from typing import Any
 import pandas as pd
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
+from ..branding import Branding
 from ..validators.quality_validator import ValidationReport
 
 TEMPLATE_DIR = Path(__file__).resolve().parent.parent / "templates"
@@ -37,6 +38,7 @@ def render_qa_report(
     source_filename: str,
     crm: str,
     structural: dict[str, Any] | None = None,
+    branding: Branding | None = None,
 ) -> str:
     summary = report.summary()
     flagged = set(report.flagged_rows)
@@ -47,6 +49,7 @@ def render_qa_report(
         source_filename=source_filename,
         crm=crm,
         generated_at=datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC"),
+        branding=branding or Branding.load(),
         summary=summary,
         checks=report.checks,
         issues_table=_table(report.issues_frame()),
@@ -58,12 +61,16 @@ def render_qa_report(
 
 
 def render_audit_report(
-    stats: dict[str, Any], mismatches: pd.DataFrame, project_name: str
+    stats: dict[str, Any],
+    mismatches: pd.DataFrame,
+    project_name: str,
+    branding: Branding | None = None,
 ) -> str:
     template = _environment.get_template("audit_template.html")
     return template.render(
         project_name=project_name,
         generated_at=datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC"),
+        branding=branding or Branding.load(),
         stats=stats,
         mismatch_table=_table(mismatches),
     )

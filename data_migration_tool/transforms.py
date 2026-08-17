@@ -88,19 +88,24 @@ def is_valid_email(value: Any) -> bool:
     return bool(EMAIL_PATTERN.match(str(value).strip()))
 
 
-def to_iso_date(value: Any, output_format: str = "%Y-%m-%d") -> Any:
+def to_iso_date(
+    value: Any, output_format: str = "%Y-%m-%d", dayfirst: bool | None = None
+) -> Any:
     """Parse a heterogeneous date value into a single output format.
 
-    Ambiguous numeric dates are read day-first only when the first component
-    cannot be a month, which keeps ``12/31/24`` and ``31/12/24`` consistent.
+    ``dayfirst`` resolves ambiguous numeric dates such as ``04/03/2026``: pass
+    ``True`` for European sources, ``False`` for US ones. When it is ``None`` the
+    value is read day-first only if the first component cannot be a month, which
+    is a guess and should not be relied on for a mixed-locale file.
     """
     if is_missing(value):
         return value
     if isinstance(value, (datetime, date, pd.Timestamp)):
         return value.strftime(output_format)
     text = str(value).strip()
-    leading = re.match(r"^(\d{1,2})[/.-](\d{1,2})[/.-](\d{2,4})$", text)
-    dayfirst = leading is not None and int(leading.group(1)) > 12
+    if dayfirst is None:
+        leading = re.match(r"^(\d{1,2})[/.-](\d{1,2})[/.-](\d{2,4})$", text)
+        dayfirst = leading is not None and int(leading.group(1)) > 12
     try:
         parsed = date_parser.parse(text, dayfirst=dayfirst)
     except (ValueError, OverflowError):

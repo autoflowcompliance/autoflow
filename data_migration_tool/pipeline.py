@@ -9,6 +9,7 @@ from typing import Any
 
 import pandas as pd
 
+from .branding import Branding
 from .cleaners import CleaningConfig, CleaningResult, clean_data
 from .mappers import MappingConfig, MappingResult, load_mapping_config, map_data
 from .reporters import render_qa_report
@@ -49,13 +50,20 @@ def run_pipeline(
     project_name: str = "Data migration",
     source_filename: str = "upload.csv",
     run_structural_check: bool = True,
+    branding: Branding | None = None,
 ) -> PipelineResult:
     cleaning_config = cleaning_config or CleaningConfig()
+    branding = branding or Branding.load()
     mapping_config = load_mapping_config(crm)
 
     cleaning = clean_data(source, cleaning_config)
     mapping = map_data(cleaning.frame, mapping_config)
-    validation = validate_data(mapping.frame, mapping_config, cleaning_config.date_format)
+    validation = validate_data(
+        mapping.frame,
+        mapping_config,
+        cleaning_config.date_format,
+        cleaning_config.date_dayfirst,
+    )
 
     structural: dict[str, Any] | None = None
     if run_structural_check:
@@ -73,5 +81,6 @@ def run_pipeline(
         source_filename=source_filename,
         crm=mapping_config.crm,
         structural=structural,
+        branding=branding,
     )
     return PipelineResult(cleaning, mapping, validation, html, mapping_config)

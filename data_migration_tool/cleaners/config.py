@@ -22,6 +22,8 @@ class CleaningConfig:
     lowercase_emails: bool = True
     standardize_dates: bool = True
     date_format: str = "%Y-%m-%d"
+    date_dayfirst: bool | None = None
+    """``True`` for European sources, ``False`` for US ones, ``None`` to guess."""
     standardize_phones: bool = True
     default_region: str = "US"
     fix_scientific_notation: bool = True

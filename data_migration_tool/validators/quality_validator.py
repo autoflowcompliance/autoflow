@@ -90,6 +90,7 @@ def validate_data(
     frame: pd.DataFrame,
     config: MappingConfig | None = None,
     date_format: str = "%Y-%m-%d",
+    dayfirst: bool | None = None,
 ) -> ValidationReport:
     report = ValidationReport(total_records=len(frame))
     required = set(config.required_fields()) if config else set()
@@ -150,7 +151,9 @@ def validate_data(
             report.record(f"validity:{column}", len(invalid))
 
         if transform == "date_iso":
-            normalized = series.map(lambda v: to_iso_date(v, date_format)).astype("string")
+            normalized = series.map(
+                lambda v: to_iso_date(v, date_format, dayfirst)
+            ).astype("string")
             mismatched = series.index[~blanks & (series.astype("string") != normalized)]
             for index in mismatched:
                 report.issues.append(

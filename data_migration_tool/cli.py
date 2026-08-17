@@ -6,17 +6,13 @@ import argparse
 import sys
 from pathlib import Path
 
-import pandas as pd
-
 from .auditors import audit_import
+from .branding import Branding
 from .cleaners import load_cleaning_config
+from .io_utils import SourceFileError, read_source
 from .mappers import available_crms
 from .pipeline import run_pipeline
 from .reporters import render_audit_report
-
-
-def _read_csv(path: Path) -> pd.DataFrame:
-    return pd.read_csv(path, dtype=str, keep_default_na=False)
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -31,6 +27,13 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("-o", "--outdir", default=Path("output"), type=Path)
     parser.add_argument("--cleaning-config", type=Path, default=None)
     parser.add_argument("--project", default="Data migration")
+    parser.add_argument(
+        "--date-order",
+        choices=["auto", "dayfirst", "monthfirst"],
+        default="auto",
+        help="how to read ambiguous dates such as 04/03/2026 (default: guess per value)",
+    )
+    parser.add_argument("--branding-config", type=Path, default=None)
     parser.add_argument("--audit-export", type=Path, default=None, help="CRM export to audit")
     parser.add_argument("--audit-key", default=None, help="unique key column for the audit")
     return parser
@@ -40,12 +43,24 @@ def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
     args.outdir.mkdir(parents=True, exist_ok=True)
 
+    cleaning_config = load_cleaning_config(args.cleaning_config)
+    if args.date_order != "auto":
+        cleaning_config.date_dayfirst = args.date_order == "dayfirst"
+    branding = Branding.load(args.branding_config)
+
+    try:
+        source = read_source(args.input)
+    except SourceFileError as error:
+        print(error, file=sys.stderr)
+        return 2
+
     result = run_pipeline(
-        source=_read_csv(args.input),
+        source=source,
         crm=args.crm,
-        cleaning_config=load_cleaning_config(args.cleaning_config),
+        cleaning_config=cleaning_config,
         project_name=args.project,
         source_filename=args.input.name,
+        branding=branding,
     )
     result.clean_frame.to_csv(args.outdir / "clean_data.csv", index=False)
     result.mapping_log().to_csv(args.outdir / "mapping_log.csv", index=False)
@@ -66,12 +81,12 @@ def main(argv: list[str] | None = None) -> int:
             return 2
         audit = audit_import(
             expected=result.clean_frame,
-            exported=_read_csv(args.audit_export),
+            exported=read_source(args.audit_export),
             key=args.audit_key,
         )
         audit.mismatches.to_csv(args.outdir / "audit_mismatches.csv", index=False)
         (args.outdir / "audit_report.html").write_text(
-            render_audit_report(audit.stats(), audit.mismatches, args.project),
+            render_audit_report(audit.stats(), audit.mismatches, args.project, branding),
             encoding="utf-8",
         )
         print(
