@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>n8n lead intake demo | AutoFlowCompliance</title>
+<meta name="description" content="80-second screen recording of an n8n lead-intake workflow: validation, dedupe, CRM write with 3 retries, dead-letter branch and Slack alerting.">
+<meta name="robots" content="noindex">
+<style>
+  :root { --bg:#0d0f14; --ink:#e9ebf2; --muted:#9aa1b2; --line:#242838; --accent:#8b8cff; }
+  body { margin:0; background:var(--bg); color:var(--ink); font:16px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; }
+  main { max-width:1100px; margin:0 auto; padding:32px 16px 48px; }
+  h1 { font-size:clamp(24px,4vw,34px); line-height:1.15; margin:0 0 8px; letter-spacing:-0.02em; }
+  p { color:var(--muted); margin:0 0 20px; max-width:760px; }
+  video { width:100%; height:auto; border-radius:12px; border:1px solid var(--line); background:#000; }
+  ul { color:var(--muted); padding-left:20px; }
+  a { color:var(--accent); }
+  .note { font-size:14px; margin-top:16px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>n8n lead intake: retries, dead letter, alerting</h1>
+  <p>An 80-second silent screen recording with on-screen captions, made on a local n8n instance. The demo fires four requests at a webhook: a new lead, a duplicate resent in different casing, invalid input, and a simulated CRM outage.</p>
+  <video controls preload="metadata" src="n8n-lead-intake.mp4" type="video/mp4"></video>
+  <ul>
+    <li>Webhook → validation → idempotency check on the lowercased email → CRM write with Retry on Fail (3 tries, 2 s apart).</li>
+    <li>On a failed write: an error branch to a dead-letter Google Sheet step and a Slack alert, then a 202 to the caller.</li>
+    <li>A separate Error Trigger workflow reports any outright crash to Slack.</li>
+  </ul>
+  <p class="note">In this local demo the "CRM" is a public test endpoint (httpbin.org/post, and httpbin.org/status/503 to simulate an outage), and the Sheet and Slack credentials are placeholders, so those steps run but don't post anywhere. Workflow JSON is available on request. Neo Dlamini · AutoFlowCompliance · <a href="https://github.com/autoflowcompliance">github.com/autoflowcompliance</a></p>
+</main>
+</body>
+</html>
