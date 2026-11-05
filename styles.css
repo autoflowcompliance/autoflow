@@ -1747,6 +1747,8 @@ footer{
   font-size:12px;flex-wrap:wrap;gap:12px;
 }
 
+.footer-address{flex-basis:100%;opacity:.75}
+
 /* ── RESPONSIVE ── */
 @media(max-width:960px){
   nav{padding:0 5%}
