@@ -356,22 +356,21 @@ async function startScan(event){
       return;
     }
 
-    // Fallback to proxy + pattern analysis
-    const proxyUrl=`https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
-    const response=await fetch(proxyUrl);
-    if(!response.ok)throw new Error('Could not fetch the page via proxy');
-    const data=await response.json();
-    if(!data.contents)throw new Error('Empty response from page');
-
+    // No live result: say so. Never show invented violations for a real site.
     clearInterval(loadInterval);
-    const results=generateDetailedResults(url);
-    showResults(results,url);
-
+    showScanError();
   }catch(err){
     clearInterval(loadInterval);
-    const results=generateDetailedResults(url);
-    showResults(results,url);
+    showScanError();
   }
+}
+
+function showScanError(){
+  hideAll();
+  document.getElementById('error-card').classList.add('show');
+  document.getElementById('scan-url').disabled=false;
+  document.querySelector('.scan-hero-btn').disabled=false;
+  document.querySelector('.scan-hero-btn').textContent='Scan Now';
 }
 
 // ── Calculate legal exposure pricing based on lawsuit data ──
@@ -414,38 +413,6 @@ function formatCurrency(num){
   return new Intl.NumberFormat(locale,{style:'currency',currency:siteCurrency,minimumFractionDigits:0}).format(num);
 }
 
-// ── Pattern-based detailed results ──
-function generateDetailedResults(url){
-  const seed=url.split('').reduce((a,c)=>a+c.charCodeAt(0),0);
-  const r=(mn,mx)=>mn+Math.floor(((seed*9301+49297)%233280)/233280*(mx-mn));
-
-  const violationIds=Object.keys(VIOLATION_INFO);
-  const count=r(8,14);
-  const selected=[];
-  for(let i=0;i<count;i++){
-    const idx=(seed*(i+7)*31)%violationIds.length;
-    const id=violationIds[Math.abs(idx)];
-    if(!selected.find(v=>v.id===id)){
-      const info=VIOLATION_INFO[id];
-      const nodeCount=info.impact==='critical'?r(3,12):info.impact==='serious'?r(2,8):r(1,5);
-      selected.push({id,...info,count:nodeCount,wcagCriteria:'WCAG 2.1 AA'});
-    }
-  }
-
-  const total=selected.reduce((a,v)=>a+v.count,0);
-  const critical=selected.filter(v=>v.impact==='critical'||v.impact==='serious').reduce((a,v)=>a+v.count,0);
-
-  return{
-    violations:selected.sort((a,b)=>({critical:0,serious:1,moderate:2,minor:3}[a.impact]||4)-({critical:0,serious:1,moderate:2,minor:3}[b.impact]||4)),
-    total,
-    critical,
-    pagesAffected:r(4,18),
-    wcagScore:Math.max(0,Math.round(100-(total*2.1))),
-    isRealData:false,
-    url
-  };
-}
-
 // ── Show results ──
 function showResults(data,url){
   scanResults=data;
@@ -462,7 +429,7 @@ function showResults(data,url){
   document.getElementById('result-url-link').href=url;
   document.getElementById('result-title').className=`result-title ${titleClass}`;
   document.getElementById('result-title').textContent=`${data.total} accessibility violations found on ${hostname}`;
-  document.getElementById('risk-pill').innerHTML=`<span class="risk-pill ${riskClass}">${riskLevel} Legal Risk${data.isRealData?' · Live Scan Data':' · Pattern Analysis'}</span>`;
+  document.getElementById('risk-pill').innerHTML=`<span class="risk-pill ${riskClass}">${riskLevel} Legal Risk · Live Scan Data</span>`;
 
   document.getElementById('total-violations').textContent=data.total;
   document.getElementById('critical-count').textContent=data.critical;
