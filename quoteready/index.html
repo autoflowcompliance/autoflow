@@ -9,133 +9,206 @@
 <meta property="og:description" content="A data-readiness report for CRM migration quotes. Price the data line before you sign the SOW.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://autoflowcompliance.github.io/autoflow/quoteready/">
+<meta name="theme-color" content="#f7f7fb">
 <link rel="canonical" href="https://autoflowcompliance.github.io/autoflow/quoteready/">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%234f46e5'/%3E%3Cstop offset='1' stop-color='%239333ea'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='32' height='32' rx='8' fill='url(%23g)'/%3E%3Cpath d='M9 17l4.5 4.5L23 11' stroke='white' stroke-width='3' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 16 16%27%3E%3Crect width=%2716%27 height=%2716%27 rx=%274%27 fill=%27%23e07b39%27/%3E%3C/svg%3E">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Inter+Tight:wght@500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+<a class="skip" href="#main">Skip to content</a>
 
 <header class="nav">
   <div class="wrap nav-inner">
-    <a class="brand" href="#top"><span class="brand-mark" aria-hidden="true"></span>QuoteReady</a>
+    <a class="brand" href="#top" aria-label="QuoteReady home">
+      <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true"><defs><linearGradient id="bm" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4f46e5"/><stop offset="1" stop-color="#9333ea"/></linearGradient></defs><rect width="32" height="32" rx="8" fill="url(#bm)"/><path d="M9 17l4.5 4.5L23 11" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      QuoteReady
+    </a>
     <nav class="nav-links" aria-label="Primary">
-      <a href="#problem">Problem</a>
+      <a href="#problem">Why</a>
       <a href="#how">How it works</a>
-      <a href="#report">Report</a>
+      <a href="#report">Sample report</a>
       <a href="#pricing">Pricing</a>
+      <a href="#faq">FAQ</a>
     </nav>
-    <a class="btn btn-sm" href="mailto:autoflowcompliance@outlook.com?subject=QuoteReady%20waitlist">Join waitlist</a>
+    <a class="btn btn-dark btn-sm" href="mailto:autoflowcompliance@outlook.com?subject=QuoteReady%20waitlist">Join waitlist</a>
   </div>
 </header>
 
-<main id="top">
+<main id="main">
 
-  <section class="hero">
-    <div class="wrap">
-      <p class="eyebrow">For CRM and ERP migration consultants</p>
-      <h1>Scope the data<br>before you quote the migration.</h1>
-      <p class="lede">Every migration quote has a clean line for building the new system and a vague line for the data. QuoteReady reads the client's export and tells you what is actually in it, so the data line is a number you can defend.</p>
-      <div class="cta-row">
-        <a class="btn" href="mailto:autoflowcompliance@outlook.com?subject=QuoteReady%20waitlist">Join the waitlist</a>
-        <a class="btn btn-ghost" href="#report">See a sample report</a>
+  <section class="hero" id="top">
+    <div class="hero-glow" aria-hidden="true"></div>
+    <div class="wrap hero-grid">
+      <div class="hero-copy">
+        <p class="badge"><span class="badge-dot"></span>For CRM &amp; ERP migration consultants</p>
+        <h1>Scope the data<br><span class="grad">before you quote.</span></h1>
+        <p class="lede">The build line on a migration quote is easy. The data line is a guess, and it eats the margin. QuoteReady reads the client's export and gives you the dedupe rate, the field map and every format problem, so you price the data from evidence.</p>
+        <div class="cta-row">
+          <a class="btn btn-primary" href="mailto:autoflowcompliance@outlook.com?subject=QuoteReady%20waitlist">Join the waitlist
+            <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+          <a class="btn btn-ghost" href="#report">See a real report</a>
+        </div>
+        <p class="fine">$19/month · cancel any time · full refund within 14 days</p>
       </div>
-      <p class="fine">$19/month · cancel any time · full refund within 14 days</p>
+
+      <figure class="window" aria-label="QuoteReady scoping report preview">
+        <div class="window-bar" aria-hidden="true"><i></i><i></i><i></i><span>messy_contacts.csv → HubSpot</span></div>
+        <div class="window-body">
+          <div class="kpis">
+            <div class="kpi"><span class="kpi-n">84%</span><span class="kpi-l">Data quality</span></div>
+            <div class="kpi"><span class="kpi-n">66.7%</span><span class="kpi-l">Rows pass all checks</span></div>
+            <div class="kpi"><span class="kpi-n">1</span><span class="kpi-l">Duplicate removed</span></div>
+          </div>
+          <div class="map" role="table" aria-label="Field map excerpt">
+            <div class="map-row map-head" role="row"><span role="columnheader">Source column</span><span role="columnheader">HubSpot field</span><span role="columnheader">Status</span></div>
+            <div class="map-row" role="row"><span role="cell"><code>Email Address</code></span><span role="cell"><code>email</code></span><span role="cell"><i class="tag tag-warn">1 missing</i></span></div>
+            <div class="map-row" role="row"><span role="cell"><code>Phone 1</code></span><span role="cell"><code>phone</code></span><span role="cell"><i class="tag tag-warn">2 to review</i></span></div>
+            <div class="map-row" role="row"><span role="cell"><code>Created Date</code></span><span role="cell"><code>createdate</code></span><span role="cell"><i class="tag tag-ok">5 formats fixed</i></span></div>
+            <div class="map-row" role="row"><span role="cell"><code>SKU</code></span><span role="cell" class="muted">no target field</span><span role="cell"><i class="tag tag-bad">client call</i></span></div>
+          </div>
+        </div>
+        <figcaption>Real output on the bundled sample file. Your numbers come from your client's export.</figcaption>
+      </figure>
+    </div>
+
+    <div class="wrap reads">
+      <span>Maps to</span>
+      <ul>
+        <li>HubSpot</li><li>Salesforce</li><li>Pipedrive</li><li>Zoho</li><li>Dynamics 365</li><li>NetSuite</li><li>Xero</li><li>QuickBooks</li>
+      </ul>
     </div>
   </section>
 
-  <section id="problem" class="section">
+  <section class="section" id="problem">
     <div class="wrap">
-      <h2>The data line eats the margin.</h2>
-      <p class="section-lede">It's the part of the project you can't see until you've already signed.</p>
-      <div class="grid-3">
-        <article class="card">
+      <p class="kicker">The problem</p>
+      <h2>Data is a third of the work and a guess on the quote.</h2>
+      <div class="pain">
+        <article>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h10M4 18h7" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg>
           <h3>Fields nobody can explain</h3>
-          <p>The client sends exports with columns named by an admin who left years ago. You find out what they mean on day nine of a five-day project.</p>
+          <p>Two "status" columns, and nobody on the client's side knows which one is real. You find out mid-project, not at the quote.</p>
         </article>
-        <article class="card">
+        <article>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="11" height="11" rx="2" stroke="currentColor" stroke-width="1.8" fill="none"/><rect x="10" y="9" width="11" height="11" rx="2" stroke="currentColor" stroke-width="1.8" fill="none"/></svg>
           <h3>Duplicates you didn't price</h3>
-          <p>The same contact three times with three phone formats. Every merge rule is a conversation, and every conversation is unbilled time.</p>
+          <p>The same customer in there three times. Every merge rule is a meeting, and every meeting is unbilled time.</p>
         </article>
-        <article class="card">
-          <h3>"We'll clean it after go-live"</h3>
-          <p>That cleanup almost never happens. The mess moves into the new system, and the consultant gets the blame.</p>
+        <article>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5" stroke="currentColor" stroke-width="1.8" fill="none"/><path d="M12 7.5V12l3 2" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg>
+          <h3>Discovery by hand</h3>
+          <p>Excel, regex and OpenRefine on every new client, just to learn what's in the file.</p>
         </article>
       </div>
     </div>
   </section>
 
-  <section id="how" class="section">
+  <section class="section" id="how">
     <div class="wrap">
-      <h2>From export to quote in one pass.</h2>
+      <p class="kicker">How it works</p>
+      <h2>From export to a defensible data line.</h2>
       <ol class="steps">
-        <li>
-          <span class="step-n">01</span>
-          <h3>Drop in the export</h3>
-          <p>CSV, Excel or JSON from HubSpot, Salesforce, Pipedrive, Zoho, Xero, QuickBooks and 12 other systems.</p>
-        </li>
-        <li>
-          <span class="step-n">02</span>
-          <h3>Pick the target system</h3>
-          <p>QuoteReady maps the columns onto the target's schema and flags every field it can't place.</p>
-        </li>
-        <li>
-          <span class="step-n">03</span>
-          <h3>Quote from the report</h3>
-          <p>Duplicates, invalid emails and phones, inconsistent dates and unmapped fields, each marked as fixed automatically or needing review. Paste it into the SOW.</p>
-        </li>
+        <li><span class="num">1</span><div><h3>Drop in a sample</h3><p>500–1,000 rows of the client's CSV, Excel or JSON export is enough to size the job.</p></div></li>
+        <li><span class="num">2</span><div><h3>Pick the target</h3><p>18 target schemas ship ready. Columns are mapped automatically, and every field that can't be placed is flagged.</p></div></li>
+        <li><span class="num">3</span><div><h3>Quote from evidence</h3><p>Dedupe rate, format problems, missing required fields and unmapped columns, each marked as fixed automatically or needing a decision.</p></div></li>
       </ol>
     </div>
   </section>
 
-  <section id="report" class="section">
+  <section class="section">
     <div class="wrap">
-      <h2>What the report shows.</h2>
-      <p class="section-lede">Real output for the 7-row <code>messy_contacts.csv</code> sample, mapped to HubSpot. Small file, same problems you'll find in a 70,000-row one. Your numbers come from your client's file.</p>
-      <div class="report" role="table" aria-label="Sample scoping report">
-        <div class="report-head" role="row">
-          <span role="columnheader">Issue</span><span role="columnheader">Rows</span><span role="columnheader">Fix</span>
-        </div>
-        <div class="report-row" role="row"><span role="cell">Exact duplicate contact, removed</span><span role="cell">1</span><span role="cell"><i class="pill pill-lo">Automatic</i></span></div>
-        <div class="report-row" role="row"><span role="cell">"Created Date" written 5 different ways (12/31/24, 31-Dec-24, 2024/02/17…)</span><span role="cell">6</span><span role="cell"><i class="pill pill-lo">Automatic</i></span></div>
-        <div class="report-row" role="row"><span role="cell">Column with no HubSpot contact field ("SKU"), dropped from the import</span><span role="cell">1 col</span><span role="cell"><i class="pill pill-hi">Client call</i></span></div>
-        <div class="report-row" role="row"><span role="cell">Required email missing</span><span role="cell">1</span><span role="cell"><i class="pill pill-hi">Client call</i></span></div>
-        <div class="report-row" role="row"><span role="cell">Phone invalid ("12345") or not in E.164 form</span><span role="cell">2</span><span role="cell"><i class="pill pill-md">Review</i></span></div>
-        <div class="report-foot">Data quality 84% · records passing every check 66.7% · every change logged cell by cell</div>
+      <p class="kicker">What you get</p>
+      <h2>Your discovery spreadsheet, in one pass.</h2>
+      <div class="bento">
+        <article class="tile tile-wide">
+          <h3>A field map you can hand to the client</h3>
+          <p>Every source column against the target schema, with unplaceable fields called out: the sheet the client signs before the build is quoted.</p>
+          <div class="chips" aria-hidden="true"><span>Email Address → email</span><span>Phone 1 → phone</span><span>Created Date → createdate</span><span class="chip-bad">SKU → ?</span></div>
+        </article>
+        <article class="tile">
+          <h3>Dedupe rate</h3>
+          <p>Exact duplicates found and removed, each removal logged.</p>
+          <p class="big">1 <small>duplicate in the sample</small></p>
+        </article>
+        <article class="tile">
+          <h3>Format fixes</h3>
+          <p>Dates, phones (E.164), emails and casing, standardised automatically.</p>
+          <p class="big mono">5 date formats → 1</p>
+        </article>
+        <article class="tile tile-wide">
+          <h3>Cell-level change log</h3>
+          <p>Before and after for every value touched, so "what did you change?" has a one-click answer, with your logo on the client-facing report.</p>
+        </article>
       </div>
     </div>
   </section>
 
-  <section id="pricing" class="section">
+  <section class="section" id="report">
+    <div class="wrap">
+      <p class="kicker">Sample report</p>
+      <h2>Real output, not a mock-up.</h2>
+      <p class="section-lede">The bundled <code>messy_contacts.csv</code> sample, mapped to HubSpot. A small file with the same problems as a large one.</p>
+      <div class="report" role="table" aria-label="Sample scoping report">
+        <div class="report-row report-head" role="row"><span role="columnheader">Issue</span><span role="columnheader">Rows</span><span role="columnheader">Fix</span></div>
+        <div class="report-row" role="row"><span role="cell">Exact duplicate contact, removed</span><span role="cell">1</span><span role="cell"><i class="tag tag-ok">Automatic</i></span></div>
+        <div class="report-row" role="row"><span role="cell">"Created Date" written 5 different ways</span><span role="cell">6</span><span role="cell"><i class="tag tag-ok">Automatic</i></span></div>
+        <div class="report-row" role="row"><span role="cell">Column with no HubSpot contact field ("SKU")</span><span role="cell">1 col</span><span role="cell"><i class="tag tag-bad">Client call</i></span></div>
+        <div class="report-row" role="row"><span role="cell">Required email missing</span><span role="cell">1</span><span role="cell"><i class="tag tag-bad">Client call</i></span></div>
+        <div class="report-row" role="row"><span role="cell">Phone invalid ("12345") or not E.164</span><span role="cell">2</span><span role="cell"><i class="tag tag-warn">Review</i></span></div>
+        <div class="report-foot">Data quality 84% · 66.7% of records pass every check · every change logged cell by cell</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="pricing">
     <div class="wrap pricing">
       <div>
-        <h2>One plan. Founding price.</h2>
-        <p class="section-lede">We onboard founding members by hand while the self-serve signup is built. Your hosted workspace is ready within one business day of subscribing.</p>
+        <p class="kicker">Pricing</p>
+        <h2>Less than one hour of discovery.</h2>
+        <p class="section-lede">One plan at the founding price. Founding members are onboarded by hand while self-serve signup is built: your hosted workspace is ready within one business day.</p>
       </div>
       <div class="price-card">
-        <p class="price"><span>$19</span>/month</p>
+        <p class="plan">Founding plan</p>
+        <p class="price"><span>$19</span> / month</p>
         <ul class="ticks">
           <li>Unlimited scoping reports</li>
-          <li>18 target systems: HubSpot, Salesforce, Pipedrive, Zoho, Dynamics 365, NetSuite, Xero, QuickBooks…</li>
-          <li>Before/after change log for every cleaned cell</li>
-          <li>Your logo on the client-facing report</li>
-          <li>Cancel any time; full refund within 14 days</li>
+          <li>18 target schemas: HubSpot, Salesforce, Pipedrive, Zoho, Dynamics 365, NetSuite, Xero, QuickBooks and more</li>
+          <li>Cell-level before/after change log</li>
+          <li>Your logo on client-facing reports</li>
+          <li>Cancel any time · full refund within 14 days</li>
         </ul>
-        <a class="btn btn-block" href="mailto:autoflowcompliance@outlook.com?subject=QuoteReady%20waitlist">Join the waitlist</a>
-        <p class="fine">Need the clean import file too? <a href="mailto:autoflowcompliance@outlook.com?subject=QuoteReady%20done-for-you%20migration">We do done-for-you migrations.</a></p>
+        <a class="btn btn-primary btn-block" href="mailto:autoflowcompliance@outlook.com?subject=QuoteReady%20waitlist">Join the waitlist</a>
+        <p class="fine center">Want the clean import file as well? <a href="mailto:autoflowcompliance@outlook.com?subject=QuoteReady%20done-for-you%20migration">We do done-for-you migrations.</a></p>
       </div>
     </div>
   </section>
 
-  <section class="section faq">
+  <section class="section" id="faq">
+    <div class="wrap faq">
+      <div>
+        <p class="kicker">FAQ</p>
+        <h2>Questions.</h2>
+      </div>
+      <div>
+        <details><summary>Where does my client's data go?</summary><p>It's processed to build the report and isn't used for anything else, and you can delete a workspace's files at any time. If the data can't leave your network, a self-hosted licence is available.</p></details>
+        <details><summary>Is it an AI guess?</summary><p>No. The checks are deterministic rules and schema mappings: the same file gives the same report every time, and every number traces back to the rows behind it.</p></details>
+        <details><summary>Which target systems are supported?</summary><p>18 target schemas, including HubSpot, Salesforce, Pipedrive, Zoho CRM, Zoho Books, Dynamics 365, NetSuite, Xero, QuickBooks and monday.com. Any CSV, Excel or JSON export can be read.</p></details>
+        <details><summary>Is this a new product?</summary><p>Yes. QuoteReady is new and runs on the DataFlow migration engine by AutoFlowCompliance. Founding members keep the founding price while they stay subscribed.</p></details>
+      </div>
+    </div>
+  </section>
+
+  <section class="final">
     <div class="wrap">
-      <h2>Questions.</h2>
-      <details><summary>Where does my client's data go?</summary><p>It's processed in memory to build the report and isn't used for anything else. You can delete a workspace's files at any time. A self-hosted licence is available if the data can't leave your network.</p></details>
-      <details><summary>Is it an AI guess?</summary><p>No. The checks are deterministic rules and schema mappings, so the same file gives the same report every time, and every number traces back to the rows behind it.</p></details>
-      <details><summary>Which systems does it read?</summary><p>Any CSV, Excel or JSON export. Target schemas ship for HubSpot, Salesforce, Pipedrive, Zoho CRM, Zoho Books, Dynamics 365, NetSuite, Xero, QuickBooks, FreshBooks, Freshsales, Close, Attio, Airtable, Insightly, monday.com, Sage and Wave.</p></details>
-      <details><summary>Is this a new product?</summary><p>Yes. QuoteReady is new and runs on the DataFlow migration engine by AutoFlowCompliance. Founding members get the founding price for as long as they stay subscribed.</p></details>
+      <div class="final-inner">
+        <h2>Stop guessing the data line.</h2>
+        <p>Run your next client's export through QuoteReady before you send the SOW.</p>
+        <a class="btn btn-light" href="mailto:autoflowcompliance@outlook.com?subject=QuoteReady%20waitlist">Join the waitlist</a>
+      </div>
     </div>
   </section>
 
@@ -147,6 +220,5 @@
     <span>32-46 Lepelhout St, Vanderbijlpark S. E. 3, Vanderbijlpark 1911, South Africa</span>
   </div>
 </footer>
-
 </body>
 </html>
